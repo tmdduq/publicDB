@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">공공데이터 수집</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <style name="TooltipTextAppearance">
+        <item name="android:textColor">@color/purple_200</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>

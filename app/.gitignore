@@ -1,0 +1,7 @@
+/build
+/build.gradle
+*.jks
+/src/main/res/values/apikey.xml
+/release
+/src/main/res/xml/network_security_config.xml
+/build.gradles

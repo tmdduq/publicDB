@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/kakao_root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:layout_weight="0.1"
+    android:layout_margin="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.95"
+        android:gravity="right"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/kakao_title"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="이 위치가 맞으신가요?"
+            android:textStyle="bold"
+            android:autoSizeTextType="uniform"/>
+
+        <Button
+            android:id="@+id/kakao_help"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:autoSizeTextType="uniform"
+            android:background="@drawable/layout_border"
+            android:layout_marginBottom="5dp"
+            android:maxLines="1"
+            android:padding="3dp"
+            android:text="도움말"/>
+
+    </LinearLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/kakaomapView_layout"
+        android:padding="10dp"
+        android:background="@drawable/layout_border"
+        android:layout_weight="0.35">
+
+        <RelativeLayout
+            android:id="@+id/kakaomapView"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:background="@drawable/layout_border" />
+
+        <ImageView
+            android:id="@+id/xpng"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:background="@mipmap/xpng"/>
+        <TextView
+            android:id="@+id/xpng_guide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/xpng"
+            android:layout_toRightOf="@id/xpng"
+            android:textStyle="bold"
+            android:text="여기에 맞춰주세요."/>
+
+        <Button
+            android:id="@+id/kakao_undo_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="5dp"
+            android:autoSizeTextType="uniform"
+            android:visibility="invisible"
+            android:text="되돌리기" />
+
+        <Button
+            android:id="@+id/kakao_maptype_swap_button"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:background="@drawable/layout_xpenfl"
+            android:text="일반지도"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:autoSizeTextType="uniform"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_margin="5dp"/>
+        <Button
+            android:id="@+id/kakao_make_rndur_button"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_margin="7dp"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:layout_alignParentTop="true"
+            android:autoSizeTextType="uniform"
+            android:alpha="1"
+            android:text="구역 생성"
+            android:background="@drawable/layoutbackground_black"/>
+
+        <EditText
+            android:id="@+id/kakao_log_TextView"
+            android:layout_width="match_parent"
+            android:focusable="false"
+            android:layout_height="fill_parent"
+            android:layout_centerInParent="true"
+            android:background="#90f0f0f0"
+            android:visibility="invisible" />
+
+        <Button
+            android:id="@+id/kakao_log_button"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:background="@drawable/layout_xpenfl"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="5dp"
+            android:autoSizeTextType="uniform"
+            android:visibility="visible" />
+
+    </RelativeLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.7">
+
+        <LinearLayout
+            android:id="@+id/kakao_layout_form1"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1.3"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/kakao_latitude_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="3dp"
+                    android:autoSizeTextType="uniform"
+                    android:lines="1"
+                    android:layout_weight="0.27"
+                    android:background="@drawable/layout_border_label"
+                    android:text="위도" />
+
+                <Button
+                    android:id="@+id/kakao_latitude_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.23"
+                    android:layout_margin="3dp"
+                    android:paddingLeft="2dp"
+                    android:paddingRight="2dp"
+                    android:autoSizeTextType="uniform"
+                    android:lines="1"
+                    android:background="@drawable/layout_border_gray"
+                    android:text="자동입력" />
+
+                <Button
+                    android:id="@+id/kakao_longitude_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.27"
+                    android:layout_margin="3dp"
+                    android:autoSizeTextType="uniform"
+                    android:lines="1"
+                    android:background="@drawable/layout_border_label"
+                    android:text="경도" />
+
+                <Button
+                    android:id="@+id/kakao_longitude_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.23"
+                    android:paddingLeft="2dp"
+                    android:paddingRight="2dp"
+                    android:background="@drawable/layout_border_gray"
+                    android:layout_margin="3dp"
+                    android:autoSizeTextType="uniform"
+                    android:lines="1"
+                    android:text="자동입력" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_weight="1.2">
+                <Button
+                    android:id="@+id/kakao_address_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingLeft="2dp"
+                    android:paddingRight="2dp"
+                    android:layout_weight="1"
+                    android:maxLines="2"
+                    android:background="@drawable/layout_border_gray"
+                    android:autoSizeTextType="uniform"
+                    android:text="주소가 표시됩니다."/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal"
+                android:layout_weight="1.2">
+                <Button
+                    android:id="@+id/kakao_address2_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/layout_border_label"
+                    android:layout_weight="3"
+                    android:autoSizeTextType="uniform"
+                    android:text="장소설명"/>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1">
+
+                    <Button
+                        android:id="@+id/kakao_address2_value"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="5dp"
+                        android:layout_weight="1"
+                        android:lines="1"
+                        android:background="@drawable/layout_border_gray"
+                        android:autoSizeTextType="uniform"
+                        android:text="-미지정-"/>
+
+                    <TextView
+                        android:id="@+id/kakao_name_id"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="ID : " />
+                </FrameLayout>
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal"
+                android:layout_weight="1.2">
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.5"
+                    android:lines="2"
+                    android:background="#00000000"
+                    android:autoSizeTextType="uniform"
+                    android:text=""/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1.2"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/kakao_accept1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/layout_border_yellow"
+                    android:autoSizeTextType="uniform"
+                    android:text="위치 확인"/>
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/kakao_layout_form2"
+            android:visibility="invisible"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_weight="1">
+                <Button
+                    android:id="@+id/kakao_pname_label"
+                    android:layout_width="match_parent"
+                    android:layout_margin="5dp"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/layout_border_label"
+                    android:layout_weight="0.4"
+                    android:autoSizeTextType="uniform"
+                    android:text="지역"/>
+
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.3" >
+                    <osy.kcg.utils.MyAutoCompleteTextView
+                        android:id="@+id/kakao_pname_value"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="5dp"
+                        android:paddingLeft="10dp"
+                        android:gravity="center"
+                        android:background="@drawable/layout_border"
+                        android:completionThreshold="0"
+                        android:hint="소속"
+                        android:inputType="textImeMultiLine"/>
+                    <TextView
+                        android:id="@+id/kakao_autosize_supprt_textView_small"
+                        android:visibility="invisible"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="10dp"
+                        android:lines="1"
+                        android:text="asd"
+                        android:autoSizeTextType="uniform" />
+                </FrameLayout>
+
+                <Spinner
+                    android:id="@+id/kakao_type_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:textAlignment="center"
+                    android:layout_weight="0.25"
+                    android:background="@drawable/layout_border"
+                    android:entries="@array/rndur" />
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:layout_weight="0.85">
+                <Button
+                    android:id="@+id/kakao_name_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_margin="5dp"
+                    android:lines="1"
+                    android:autoSizeTextType="uniform"
+                    android:text="장소설명"
+                    android:background="@drawable/layout_border_label"
+                    android:layout_weight="3"/>
+
+
+                    <EditText
+                        android:id="@+id/kakao_name_value"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="5dp"
+                        android:layout_weight="1"
+                        android:padding="3dp"
+                        android:gravity="center"
+                        android:hint="예시: 외포리 3부두 선착장 잔교 앞"
+                        android:background="@drawable/layout_border" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal"
+                android:layout_weight="1">
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="5dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/kakao_accept2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/layout_border_yellow"
+                    android:autoSizeTextType="uniform"
+                    android:text="확인"/>
+            </LinearLayout>
+        </LinearLayout>
+
+    </FrameLayout>
+</LinearLayout>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+    <string-array name="rndur">
+        <item>구역 선택</item>
+        <item>사망사고 발생구역</item>
+        <item>연안사고 다발구역</item>
+        <item>연안사고 위험구역</item>
+    </string-array>
+
+    <string-array name="wkdth">
+        <item>장소 선택</item>
+        <item>갯벌</item>
+        <item>갯바위</item>
+        <item>간출암</item>
+        <item>방파제</item>
+        <item>연육교</item>
+        <item>선착장</item>
+        <item>무인도서</item>
+        <item>해수욕장</item>
+        <item>해변</item>
+        <item>해안가</item>
+    </string-array>
+
+    <string-array name="tltjf">
+        <item>시설 선택</item>
+        <item>위험표지판</item>
+        <item>차량추락표지판</item>
+        <item>위험알림판</item>
+        <item>인명구조장비함</item>
+        <item>예경보 시스템</item>
+    </string-array>
+</resources>

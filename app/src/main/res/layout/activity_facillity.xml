@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/facility_main_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="0.7"
+            android:background="@drawable/layout_border"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="10dp" />
+
+            <EditText
+                android:id="@+id/facility_logView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="10dp"
+                android:focusable="false"
+                android:visibility="invisible" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="이 곳에 사진이 표시됩니다."
+                android:gravity="center"/>
+
+            <Button
+                android:id="@+id/edit_xy"
+                android:layout_width="70dp"
+                android:layout_height="30dp"
+                android:layout_gravity="bottom|right"
+                android:layout_margin="10dp"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/layout_border"
+                android:maxLines="1"
+                android:padding="3dp"
+                android:text="위치수정"
+                android:visibility="invisible" />
+
+            <Button
+                android:id="@+id/setting"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="bottom"
+                android:layout_margin="10dp"
+                android:background="@drawable/layout_border"
+                android:maxLines="1" />
+
+            <Button
+                android:id="@+id/facility_help"
+                android:layout_width="70dp"
+                android:layout_height="30dp"
+                android:layout_gravity="top|right"
+                android:layout_margin="10dp"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/layout_border"
+                android:maxLines="1"
+                android:padding="3dp"
+                android:text="도움말"/>
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/facility_address"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.16"
+            android:autoSizeTextType="uniform"
+            android:gravity="center"
+            android:inputType="textImeMultiLine"
+            android:lines="1"
+            android:orientation="horizontal"
+            android:text="" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.1"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="3dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/facility_longitude_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="3dp"
+                        android:layout_weight="1.8"
+                        android:autoSizeTextType="uniform"
+                        android:background="@drawable/layout_border_label"
+                        android:lines="1"
+                        android:text="위도" />
+
+                    <Button
+                        android:id="@+id/facility_longitude_value"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="3dp"
+                        android:layout_weight="1"
+                        android:autoSizeTextType="uniform"
+                        android:background="@drawable/layout_border_gray"
+                        android:lines="1"
+                        android:text="자동입력" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/facility_latitude_label"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="3dp"
+                        android:layout_weight="1.8"
+                        android:autoSizeTextType="uniform"
+                        android:background="@drawable/layout_border_label"
+                        android:lines="1"
+                        android:text="경도" />
+
+                    <Button
+                        android:id="@+id/facility_latitude_value"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="3dp"
+                        android:layout_weight="1"
+                        android:autoSizeTextType="uniform"
+                        android:background="@drawable/layout_border_gray"
+                        android:lines="1"
+                        android:text="자동입력" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/facility_takePic"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/layout_border_yellow"
+                android:text="사진촬영" />
+        </LinearLayout>
+
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="5dp"
+            android:layout_marginTop="5dp"
+            android:background="@android:color/darker_gray" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.755"
+            android:id="@+id/facility_contents"
+            android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/facility_pname_type_label"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="0.3"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/layout_border_label"
+                android:text="　대상　" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.3">
+
+                <TextView
+                    android:id="@+id/facility_autosize_supprt_textView_small"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:autoSizeTextType="uniform"
+                    android:paddingLeft="10dp"
+                    android:text="소속"
+                    android:visibility="invisible" />
+
+                <osy.kcg.utils.MyAutoCompleteTextView
+                    android:id="@+id/facility_pname_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:layout_weight="0.3"
+                    android:background="@drawable/layout_border"
+                    android:completionThreshold="0"
+                    android:hint="소속"
+                    android:inputType="textImeMultiLine"
+                    android:paddingLeft="10dp" />
+            </FrameLayout>
+
+            <Button
+                android:id="@+id/facility_district_type_value"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="0.2"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/layout_border_gray"
+                android:gravity="center"
+                android:lines="1"
+                android:paddingLeft="10dp"
+                android:text="구역지정 현황(자동입력)" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.05"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/facility_placename_label"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="3"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/layout_border_label"
+                android:imeOptions="actionNext"
+                android:lines="1"
+                android:text="장소설명" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1">
+
+                <TextView
+                    android:id="@+id/facility_autosize_supprt_textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:autoSizeTextType="uniform"
+                    android:paddingLeft="20dp"
+                    android:visibility="invisible" />
+
+                <EditText
+                    android:id="@+id/facility_placename_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/layout_border"
+                    android:gravity="left|center"
+                    android:hint="예시: 외포리 3부두 선착장 잔교 앞"
+                    android:lines="3"
+                    android:paddingLeft="10dp"
+                    android:textAlignment="center" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/facility_position_label"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="3"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/layout_border_label"
+                android:imeOptions="actionNext"
+                android:text="장소분류" />
+
+            <Spinner
+                android:id="@+id/facility_position_value"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/layout_border"
+                android:entries="@array/wkdth"
+                android:paddingLeft="10dp" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1.1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/facility_facility_type_label"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="1.6"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/layout_border_label"
+                android:text="시설분류" />
+
+            <Spinner
+                android:id="@+id/facility_facility_type_value"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:background="@drawable/layout_border"
+                android:entries="@array/tltjf"
+                android:paddingLeft="10dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="3dp"
+                android:layout_weight="1.7"
+                android:orientation="vertical">
+
+                <CheckBox
+                    android:id="@+id/facility_break_checkbox"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/layout_border"
+                    android:clickable="false"
+                    android:textSize="10sp" />
+
+            </LinearLayout>
+        </LinearLayout>
+        </LinearLayout>
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="5dp"
+            android:background="@android:color/darker_gray" />
+
+        <Button
+            android:id="@+id/tltjfanf_transfer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:layout_weight="1.1"
+            android:autoSizeTextType="uniform"
+            android:background="@drawable/layout_border_yellow"
+            android:freezesText="true"
+            android:lines="1"
+            android:text="전송하기" />
+
+
+    </LinearLayout>
+</RelativeLayout>

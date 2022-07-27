@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/logo_rootView"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/logo_code_label"
+        android:layout_width="128dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="248dp"
+        android:background="@drawable/layout_border_green"
+        android:inputType="textEmailAddress"
+        android:text="코드"
+        android:textSize="25dp"
+        app:layout_constraintHorizontal_bias="0.056"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/logo_code_editText"
+        android:layout_width="238dp"
+        android:layout_height="59dp"
+        android:layout_marginTop="240dp"
+        android:hint="CODE"
+        android:textSize="30dp"
+        android:gravity="center"
+        app:layout_constraintHorizontal_bias="0.907"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/logo_login_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginStart="48dp"
+        android:layout_marginEnd="48dp"
+        android:layout_marginBottom="308dp"
+        android:background="@drawable/layout_border_yellow"
+        android:clickable="true"
+        android:text="접속하기"
+        android:textColor="#000"
+        android:textSize="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
