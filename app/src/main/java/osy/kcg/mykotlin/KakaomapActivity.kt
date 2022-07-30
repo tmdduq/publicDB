@@ -15,7 +15,6 @@ import android.text.TextWatcher
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -28,19 +27,24 @@ import io.akndmr.ugly_tooltip.TooltipBuilder
 import io.akndmr.ugly_tooltip.TooltipContentPosition
 import io.akndmr.ugly_tooltip.TooltipDialog
 import io.akndmr.ugly_tooltip.TooltipObject
-import net.daum.mf.map.api.*
+import net.daum.mf.map.api.MapPOIItem
+import net.daum.mf.map.api.MapPoint
+import net.daum.mf.map.api.MapPolyline
+import net.daum.mf.map.api.MapView
 import osy.kcg.mykotlin.databinding.ActivityKakaomapBinding
 import osy.kcg.utils.SoundSearcher
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
-import java.lang.StringBuilder
 import java.net.URL
+import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
+import kotlin.math.acos
+import kotlin.math.cos
+import kotlin.math.sin
 import kotlin.random.Random
+
 
 open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventListener, MapView.MapViewEventListener, View.OnClickListener{
     val TAG ="KakaomapActivity"
@@ -59,8 +63,44 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
     class XYRndur internal constructor(var x: Double, var y: Double, var type: String? = null, var id: String?=null)
     private var drawMode = false
     var drawModePoints = mutableListOf<MapPoint>()
+    fun calculDistance(p1:MapPoint, p2:MapPoint) : Double{
+        var lat1 = p1.mapPointGeoCoord.latitude
+        var lon1 = p1.mapPointGeoCoord.longitude
+        var lat2 = p2.mapPointGeoCoord.latitude
+        var lon2 = p2.mapPointGeoCoord.longitude
+        var theta = lon1 - lon2;
+        var dist = sin(deg2rad(lat1)) * sin(deg2rad(lat2)) + cos(deg2rad(lat1)) * cos(deg2rad(lat2)) * cos(deg2rad(theta));
+        dist = acos(dist);
+        dist = rad2deg(dist);
+        dist *= 60 * 1.1515;
+        dist *= 1.609;
+        return dist * 1000; //km -> m
+    }
 
-    var mapViewContainer : ViewGroup? = null
+
+    private fun ccw(p1 : XYRndur, p2 : XYRndur, p3 : XYRndur) =  p1.x*p2.y + p2.x*p3.y + p3.x*p1.y - (p1.x*p3.y + p2.x*p1.y + p3.x*p2.y)
+    private fun ccw(p1 : MapPoint, p2 : MapPoint, p3 : MapPoint) : Int{
+        var v = (p1.mapPointGeoCoord.longitude * p2.mapPointGeoCoord.latitude + p2.mapPointGeoCoord.longitude * p3.mapPointGeoCoord.latitude + p3.mapPointGeoCoord.longitude * p1.mapPointGeoCoord.latitude
+                - (p1.mapPointGeoCoord.longitude * p3.mapPointGeoCoord.latitude + p2.mapPointGeoCoord.longitude * p1.mapPointGeoCoord.latitude + p3.mapPointGeoCoord.longitude * p2.mapPointGeoCoord.latitude))
+        return if(v>0) 1 else if(v<0) -1 else 0
+    }
+    private fun isIntersect( p1:MapPoint, p2:MapPoint, p3:MapPoint, p4:MapPoint) : Boolean{
+        var p1p2 =  ccw(p1, p2, p3) * ccw(p1, p2, p4)
+        var p3p4 = ccw(p3, p4, p1) * ccw(p3, p4, p2)
+        return p1p2 <= 0 && p3p4<=0
+    }
+
+
+
+
+
+    private var mapViewContainer : ViewGroup? = null
+
+    // This function converts decimal degrees to radians
+    open fun deg2rad(deg: Double) = deg * Math.PI / 180.0
+    // This function converts radians to decimal degrees
+    open fun rad2deg(rad: Double) = rad * 180 / Math.PI
+
 
     fun log(TAG : String, log : String) : Unit{
         try {
@@ -119,20 +159,20 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
                     tooltips.add(
                         TooltipObject(
                             binding.kakaoPnameValue,
-                            "① 소속","당신의 <font color=\"#FFC300\">소속</font>은 어디인가요?",
+                            "② 소속","당신의 <font color=\"#FFC300\">소속</font>은 어디인가요?",
                             TooltipContentPosition.TOP)
                     )
                     tooltips.add(
                         TooltipObject(
                             binding.kakaoTypeValue,
-                            "② 구역정보",
+                            "③ 구역정보",
                             "이 구역은 <font color=\"#FFC300\">무슨 구역</font>이에요? 선택해 주세요.",
                             TooltipContentPosition.BOTTOM)
                     )
                     tooltips.add(
                         TooltipObject(
                             binding.kakaoNameValue,
-                            "②₂ 상세정보",
+                            "④ 상세정보",
                             "사진의 구역이 주소만으로는 이해하기 어려워요. <br><font color=\"#FFC300\">주소엔 표시되지 않는 위치</font>를 상세하게 입력해주세요.",
                             TooltipContentPosition.TOP)
                     )
@@ -280,6 +320,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
         when(v.id){
             binding.kakaoMakeRndurButton.id ->{
                 drawMode = !drawMode
+                log(TAG, "drawMode -> $drawMode")
                 if(drawMode){ // ON
                     binding.kakaoUndoButton.visibility = View.VISIBLE
                     binding.kakaoLayoutForm1.visibility = View.GONE
@@ -288,7 +329,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
                     binding.kakaoTitle.text = "구역정보 생성하기"
                     binding.kakaoAccept2.text = "구역정보 전송하기"
                     binding.kakaoMakeRndurButton.text = " 그리기 종료"
-                    binding.kakaoRootLayout.setBackgroundColor(Color.argb(40,2550,230,130))
+                    binding.kakaoRootLayout.setBackgroundColor(Color.argb(40,255,230,130))
                     binding.xpng.visibility = View.INVISIBLE
                     binding.xpngGuide.text = "터치로 구역을 설정하세요."
                 }
@@ -333,6 +374,11 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
                 val pnameValue = binding.kakaoPnameValue.text.toString().replace(Regex(filter), "?")
                 val nameValue = binding.kakaoNameValue.text.toString().replace(Regex(filter), "?")
 
+
+                if(nameValue.contains(Regex(filter))){
+                    val nameValue = binding.kakaoNameValue.text.toString().replace(Regex(filter), "?")
+                    tooltipDialog?.show(this,supportFragmentManager, "checkInput", arrayListOf((TooltipObject(binding.kakaoPnameValue, null, "소속을 채워주세요.",TooltipContentPosition.TOP))) )
+                }
                 if (pnameValue.contains("?") || nameValue.contains("?"))
                     Snackbar.make(binding.kakaoRootLayout, "특수문자는 삭제되어 전송됩니다.", Snackbar.LENGTH_SHORT).show()
 
@@ -341,11 +387,21 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
                     pointValues.append("/${p.mapPointGeoCoord.latitude},${p.mapPointGeoCoord.longitude}")
                 pointValues = pointValues.replace(0, 1, "")
 
-                log(TAG, "Accept2 : $pnameValue,$nameValue,$pointValues")
-                if (pnameValue.length < 2 || nameValue.length < 2 || pointValues.length < 5 || binding.kakaoTypeValue.selectedItemPosition == 0) {
-                    Snackbar.make(binding.kakaoRootLayout, "모든 필드를 입력해주세요.", Snackbar.LENGTH_SHORT).show()
+
+                val tooltips: ArrayList<TooltipObject> = ArrayList()
+                var isPname = false
+                RV().getAllpName().forEach { if(it == pnameValue) isPname = true }
+                when{
+                    drawModePoints.size < 3 -> tooltips.add(TooltipObject(binding.kakaomapView, null, "3개 지점 이상 선택해주세요.",TooltipContentPosition.BOTTOM))
+                    !isPname -> tooltips.add(TooltipObject(binding.kakaoPnameValue, null, "소속을 알맞게 채워주세요.",TooltipContentPosition.TOP))
+                    binding.kakaoTypeValue.selectedItemPosition == 0 -> tooltips.add(TooltipObject( binding.kakaoTypeValue, null, "구역을 선택하세요.", TooltipContentPosition.TOP))
+                    nameValue.length < 2 -> tooltips.add(TooltipObject(binding.kakaoNameValue, null, "장소설명을 입력하세요.", TooltipContentPosition.TOP))
+                }
+                if(tooltips.size>0){
+                    tooltipDialog?.show(this,supportFragmentManager,"checkInput",tooltips)
                     return
                 }
+
                 val param = RV()
                 param.serverUrl = resources.getString(R.string.serverUrl)
                 param.savePointUrlJsp = resources.getString(R.string.savePointUrlJsp)
@@ -371,6 +427,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
                 if(v.visibility == View.VISIBLE) v.visibility = View.INVISIBLE else v.visibility = View.VISIBLE
             }
             binding.kakaoMaptypeSwapButton.id ->{
+                log(TAG, "mapType Change")
                 var t = mapView!!.mapType
                 when(t){
                     MapView.MapType.Satellite -> {
@@ -528,10 +585,13 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
                 val pMap = Polygon()
                 for( r in rndurMap[name]!!) pMap.addPoint(r.x, r.y)
                 if(pMap.isInside(x,y)){
-                    var type = if(rndurMap[name]?.get(0)?.type!=null) rndurMap[name]?.get(0)?.type else ""
-                    var id = if(rndurMap[name]?.get(0)?.id!=null) rndurMap[name]?.get(0)?.id else ""
+                    var t = rndurMap[name]
+                    var type = if(t?.get(0)?.type!=null) t?.get(0)?.type else ""
+                    var id = if(t?.get(0)?.id!=null) t?.get(0)?.id else ""
+
                     log(TAG, "getMatchPolygon : Matched -> $id/$name ")
                     return arrayOf(name, type, id)
+
                 }
             }
         }catch(e:Exception){
@@ -712,28 +772,16 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
 
 
     private fun drawPolygon(){
-        mapView!!.polylines.forEach { p -> if(p.tag==1500) mapView!!.removePolyline(p) }
-        mapView!!.poiItems.forEach { p-> if(p.tag==1501) mapView!!.removePOIItem(p) }
-        if(drawModePoints.size<1) return
+        mapView!!.polylines.forEach {if(it.tag==1500) mapView!!.removePolyline(it) }
+        mapView!!.poiItems.forEach {if(it.tag==1501) mapView!!.removePOIItem(it) }
 
+        if(drawModePoints.size < 1) return
+
+        // Create Yellow Maker - Start
         val polyline = MapPolyline()
         polyline.tag = 1500
-
-        var maxX = 0.0
-        var minX = 999.0
-        var maxY = 0.0
-        var minY =999.0
-
         for(i in 0 until drawModePoints.size) {
             polyline.addPoint(drawModePoints[i])
-
-            var t = drawModePoints[i].mapPointGeoCoord.latitude
-            if(t < minY) minY = t
-            if(t > maxY) maxY = t
-            t = drawModePoints[i].mapPointGeoCoord.longitude
-            if(t < minX) minX = t
-            if(t > maxX) maxX = t
-
             val markerYellow = MapPOIItem()
             markerYellow.itemName = "$i"
             markerYellow.tag = 1501
@@ -743,20 +791,82 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
             markerYellow.isShowDisclosureButtonOnCalloutBalloon = false
             mapView!!.addPOIItem(markerYellow)
         }
+
         polyline.addPoint(drawModePoints[0])
         mapView!!.addPolyline(polyline)
+        // Create Yellow Maker - End
 
-        if(drawModePoints.size > 2) {
-            val markerBlue = MapPOIItem()
-            markerBlue.tag = 1501
-            markerBlue.markerType = MapPOIItem.MarkerType.CustomImage
-            markerBlue.customImageResourceId = R.mipmap.marker
-            markerBlue.itemName = "center"
-            markerBlue.isShowCalloutBalloonOnTouch = false
-            markerBlue.mapPoint = MapPoint.mapPointWithGeoCoord(minY + (maxY - minY) / 2, minX + (maxX - minX) / 2)
-
-            mapView!!.addPOIItem(markerBlue)
+        if(drawModePoints.size < 3) {
+            binding.kakaoRndurLinelength.text = ""
+            binding.kakaoRndurArea.text = ""
+            return
         }
+
+        //Calculate surface Length(m) - start
+        var lineLength = .0
+        for(i in 1..drawModePoints.size)
+            lineLength += calculDistance(drawModePoints[i - 1], drawModePoints[i % drawModePoints.size])
+        binding.kakaoRndurLinelength.text = DecimalFormat("###,###").format(lineLength )+"m"
+        //Calculate surface Length - End
+
+        //Calculate inner size(m²) - start
+        var innerArea = .0
+        var referX = drawModePoints[0].mapPointGeoCoord.longitude
+        var referY = drawModePoints[0].mapPointGeoCoord.latitude
+        var preX = drawModePoints[1].mapPointGeoCoord.longitude
+        var preY = drawModePoints[1].mapPointGeoCoord.latitude
+        var centerX = ((referX+preX)* ((referX*preY)-(preX*referY)))
+        var centerY = ((referY+preY)* ((referX*preY)-(preX*referY)))
+        for( i in 2 until drawModePoints.size){
+            var curX = drawModePoints[i].mapPointGeoCoord.longitude
+            var curY = drawModePoints[i].mapPointGeoCoord.latitude
+            var lengthPreX = calculDistance( drawModePoints[i-1], MapPoint.mapPointWithGeoCoord(preY,referX) )
+            var lengthCurX = calculDistance( drawModePoints[i], MapPoint.mapPointWithGeoCoord(curY, referX) )
+            var lengthPreY = calculDistance( drawModePoints[i-1], MapPoint.mapPointWithGeoCoord(referY ,preX) )
+            var lengthCurY = calculDistance( drawModePoints[i], MapPoint.mapPointWithGeoCoord(referY ,curX) )
+            lengthPreX = if(preX < referX ) -lengthPreX else lengthPreX
+            lengthCurX = if(curX < referX ) -lengthCurX else lengthCurX
+            lengthPreY = if(preY < referY ) -lengthPreY else lengthPreY
+            lengthCurY = if(curY < referY ) -lengthCurY else lengthCurY
+            innerArea += lengthPreX*lengthCurY
+            innerArea -= lengthPreY*lengthCurX
+
+            centerX += ((lengthPreX+lengthCurX)* ((lengthPreX*lengthCurY)-(lengthCurX*lengthPreY)))
+            centerY += ((lengthPreY+lengthCurY)* ((lengthPreX*lengthCurY)-(lengthCurX*lengthPreY)))
+//            innerArea += ccw(XYRndur(.0,.0), XYRndur(lengthPreX,lengthPreY), XYRndur(lengthCurX,lengthCurY) )
+            preX = drawModePoints[i].mapPointGeoCoord.longitude
+            preY = drawModePoints[i].mapPointGeoCoord.latitude
+        }
+        centerX = centerX / (270000 * innerArea) + referX
+        centerY = centerY / (330000 * innerArea) + referY
+        innerArea = if(innerArea > 0) innerArea/2 else -innerArea/2
+        binding.kakaoRndurArea.text = DecimalFormat("###,###").format( innerArea )+"m²"
+        //Calculate inner size(m²) - End
+
+        //create center Marker - start
+        val markerCenter = MapPOIItem()
+        markerCenter.tag = 1501
+        markerCenter.markerType = MapPOIItem.MarkerType.CustomImage
+        markerCenter.customImageResourceId = R.mipmap.marker
+        markerCenter.itemName = "center"
+        markerCenter.isShowCalloutBalloonOnTouch = false
+        markerCenter.mapPoint = MapPoint.mapPointWithGeoCoord(centerY , centerX) // center
+        mapView!!.addPOIItem(markerCenter)
+        //create center Marker - End
+
+        // Polygon Validity Check - start
+        var isCrossLine = false
+        if(drawModePoints.size >= 4){
+            for( j in 2 until drawModePoints.size-1)   //01 12 23   34 40     // size 5
+                if(isIntersect(drawModePoints[j-1], drawModePoints[j], drawModePoints[0], drawModePoints[drawModePoints.size-1])) isCrossLine = true
+            for( j in 1 until drawModePoints.size-2)   //01 12    23 34 40     // size 5
+                if(isIntersect(drawModePoints[j-1], drawModePoints[j], drawModePoints[drawModePoints.size-2], drawModePoints[drawModePoints.size-1])) isCrossLine = true
+        }
+        if(isCrossLine){
+            tooltipDialog?.show(this,supportFragmentManager, "checkInput", arrayListOf((TooltipObject(binding.xpng, null, "선을 교차해서 그릴 수 없어요.",TooltipContentPosition.TOP))) )
+            onClick(binding.kakaoUndoButton)
+        }
+        // Polygon Validity Check - End
     }
 
     override fun onMapViewSingleTapped(mapView : MapView?, mapPoint: MapPoint?) {

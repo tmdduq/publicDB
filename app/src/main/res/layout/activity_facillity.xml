@@ -21,6 +21,12 @@
             android:background="@drawable/layout_border"
             android:orientation="vertical">
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="이 곳에 사진이 표시됩니다."
+                android:gravity="center"/>
+
             <ImageView
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
@@ -32,13 +38,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="10dp"
+                android:background="@color/background_whitegray"
                 android:focusable="false"
                 android:visibility="invisible" />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:text="이 곳에 사진이 표시됩니다."
-                android:gravity="center"/>
 
             <Button
                 android:id="@+id/edit_xy"
@@ -97,6 +99,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:id="@+id/facility_xy_layout"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="3dp"
                 android:layout_weight="1"
@@ -356,13 +359,21 @@
                 android:layout_weight="1.7"
                 android:orientation="vertical">
 
-                <CheckBox
-                    android:id="@+id/facility_break_checkbox"
+                <Button
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@drawable/layout_border"
                     android:clickable="false"
                     android:textSize="10sp" />
+                <CheckBox
+                    android:id="@+id/facility_break_checkbox"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="invisible"
+                    android:background="@drawable/layout_border"
+                    android:clickable="false"
+                    android:textSize="10sp" />
+
 
             </LinearLayout>
         </LinearLayout>

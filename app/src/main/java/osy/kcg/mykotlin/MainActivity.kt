@@ -8,7 +8,6 @@ import android.app.ProgressDialog
 import android.content.*
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
-import android.graphics.Rect
 import android.location.LocationManager
 import android.net.Uri
 import android.os.*
@@ -16,15 +15,12 @@ import android.provider.MediaStore
 import android.provider.Settings
 import android.telephony.TelephonyManager
 import android.text.Editable
-import android.text.Html
 import android.text.TextWatcher
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import androidx.annotation.ColorRes
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
@@ -302,29 +298,30 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
         param!!.phoneNo = telephonyManager.line1Number.replace("+82", "0")
         log(TAG,"saveResultValues -> ok")
     }
+
     private fun checkResultValues() : Boolean{
-        val checkResultString = StringBuilder()
-        if(!isPicture) checkResultString.append("\n[사진미촬영] 사진을 찍어주세요.")
-        if(param!!.latitude.length <5 || param!!.longitude.length <5 ) checkResultString.append("\n[좌표인식] 위치를 확인해주세요.")
-
-        var fm1PnameCheck = false
-        for(s in param!!.getAllpName())
-            if(s == param!!.fm1_tnsckfwkdth_auto) fm1PnameCheck = true
-
-        if (!fm1PnameCheck) checkResultString.append("\n[파출소 이름] 파출소 이름을 확인해주세요.")
-        if (param!!.fm1_tnsckfwkdth.isEmpty()) checkResultString.append("\n[순찰장소 미입력] 어디인지 적어주세요.")
-
-//        if(((Spinner)findViewById(R.id.facility_district_type_value)).getSelectedItemPosition() < 1) check.append("[구역 미선택]구역을 선택하세요.\n");
-        if (binding.facilityPositionValue.selectedItemPosition < 1) checkResultString.append("\n[장소 미선택]장소를 선택하세요.")
-        if (binding.facilityFacilityTypeValue.selectedItemPosition < 1) checkResultString.append("\n[시설 미선택]시설을 선택하세요.")
-
-        if (checkResultString.isNotEmpty()) {
-            AlertDialog.Builder(mContext).setTitle("입력값 오류").setMessage(checkResultString.replace(0,1,""))
-                .setPositiveButton("확인") { dialog: DialogInterface, _: Int -> dialog.dismiss() }
-                .create().show()
-            log(TAG,"checkResultValues -> ok(false)")
+        var isPname = false
+        val tooltips: ArrayList<TooltipObject> = ArrayList()
+        param!!.getAllpName().forEach { (if(it == param!!.fm1_tnsckfwkdth_auto) isPname = true) }
+        when{
+            !isPicture -> {
+                tooltips.add(TooltipObject(binding.imageView, null, "사진 촬영을 안했어요.", TooltipContentPosition.BOTTOM))
+                tooltips.add(TooltipObject(binding.facilityTakePic, null, "사진을 찍으세요.", TooltipContentPosition.TOP))
+            }
+            param!!.latitude.length < 5 -> {
+                tooltips.add(TooltipObject(binding.facilityXyLayout, null, "좌표를 모르겠어요.", TooltipContentPosition.BOTTOM))
+                tooltips.add(TooltipObject(binding.editXy, null, "위치를 입력하세요.", TooltipContentPosition.TOP))
+            }
+            !isPname -> tooltips.add(TooltipObject(binding.facilityPnameValue, null, "소속을 알맞게 채워주세요.", TooltipContentPosition.TOP))
+            param!!.fm1_tnsckfwkdth.length < 2 -> tooltips.add(TooltipObject(binding.facilityPlacenameValue, null, "장소에 대한 설명을 적어주세요.", TooltipContentPosition.TOP))
+            binding.facilityPositionValue.selectedItemPosition < 1 -> tooltips.add(TooltipObject(binding.facilityPositionValue, null, "장소분류를 선택하세요.", TooltipContentPosition.TOP))
+            binding.facilityFacilityTypeValue.selectedItemPosition < 1 -> tooltips.add(TooltipObject(binding.facilityFacilityTypeValue, null, "시설분류를 선택하세요.", TooltipContentPosition.TOP))
+        }
+        if(tooltips.size>0){
+            tooltipDialog?.show(this,supportFragmentManager,"checkInputValue",tooltips)
             return false
         }
+
         log(TAG,"checkResultValues -> ok(true)")
         return true
     }
@@ -469,8 +466,10 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
             if(uriString!=null && uriString.length>9)
                 log(TAG, "onActivityResult - photoUri ${photoUri.toString().substring(0,9)}...${photoUri.toString().substring(uriString.length-7)}  ")
         }
-        else
+        else{
             Toast.makeText(mContext, "촬영실패!! 재시도해주세요.", Toast.LENGTH_SHORT).show()
+            log(TAG, "receive TakePhotoIntent -> fail")
+        }
     }
 
     override fun onClick(v: View) {
