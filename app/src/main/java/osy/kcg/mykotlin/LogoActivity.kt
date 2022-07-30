@@ -87,7 +87,7 @@ class LogoActivity : AppCompatActivity() {
 
             when( binding.logoCodeEditText.text.toString().uppercase() ){
                 "" -> Toast.makeText(this, "코드를 입력하세요.", Toast.LENGTH_SHORT).show()
-                "KCG" -> {
+                resources.getString(R.string.loginCode) -> {
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
                     finish()
