@@ -1,26 +1,21 @@
 package osy.kcg.mykotlin;
 
-import android.icu.text.Edits;
 import android.util.Log;
-
 import com.kcg.facillitykotlin.RV;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.Iterator;
-
-import kotlin.jvm.internal.CollectionToArray;
+import java.nio.charset.StandardCharsets;
 
 public class HTTP {
     final String TAG = "HTTP";
@@ -91,9 +86,9 @@ public class HTTP {
                 dos.flush(); // finish upload...
 
                 if (conn.getResponseCode() == 200) {
-                    InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), "UTF-8");
+                    InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8);
                     BufferedReader reader = new BufferedReader(tmp);
-                    StringBuffer stringBuffer = new StringBuffer();
+                    StringBuilder stringBuffer = new StringBuilder();
                     String line;
                     while ((line = reader.readLine()) != null) {
                         stringBuffer.append(line);
@@ -113,31 +108,31 @@ public class HTTP {
         return TRANSFER_RESULT;
     }
 
-    public int DoValuesUpload(String activityName){
+    public int DoValuesUpload(String activityName) throws UnsupportedEncodingException {
         StringBuilder dataSet = new StringBuilder();
         String url;
         if(activityName.contains("point")) {
-            dataSet.append("?upTime=" + URLEncoder.encode(param.getKa_upTime()));
-            dataSet.append("&name=" + URLEncoder.encode(param.getKa_name()));
-            dataSet.append("&pname=" + URLEncoder.encode(param.getKa_pname()));
-            dataSet.append("&type=" + URLEncoder.encode(param.getKa_type()));
-            dataSet.append("&point=" + URLEncoder.encode(param.getKa_point()));
-            url = param.getServerUrl() + param.getSavePointUrlJsp() + dataSet.toString();
+            dataSet.append("?upTime=").append(URLEncoder.encode(param.getKa_upTime(), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&name=").append(URLEncoder.encode(param.getKa_name(), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&pname=").append(URLEncoder.encode(param.getKa_pname(), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&type=").append(URLEncoder.encode(param.getKa_type(), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&point=").append(URLEncoder.encode(param.getKa_point(), StandardCharsets.UTF_8.toString()));
+            url = param.getServerUrl() + param.getSavePointUrlJsp() + dataSet;
         }
         else{
-            dataSet.append("?timeStamp=" + URLEncoder.encode(param.getTimeStamp()));
-            dataSet.append("&add=" + URLEncoder.encode(param.getAddress()));
-            dataSet.append("&latitude=" + URLEncoder.encode(param.getLatitude()));
-            dataSet.append("&longitude=" + URLEncoder.encode(param.getLongitude()));
-            dataSet.append("&form1=" + URLEncoder.encode(param.getFm2_rndur()));
-            dataSet.append("&form2=" + URLEncoder.encode(param.getFm3_wkdth()));
-            dataSet.append("&form3=" + URLEncoder.encode(param.getFm1_tnsckfwkdth()));
-            dataSet.append("&form4=" + URLEncoder.encode(param.getFm4_tltjf()));
-            dataSet.append("&form4_check=" + URLEncoder.encode(param.getFm4_tltjf_check()));
-            dataSet.append("&phoneNo=" + URLEncoder.encode(param.getPhoneNo()));
-            dataSet.append("&phoneName=" + URLEncoder.encode(param.getFm1_tnsckfwkdth_auto()));
-            dataSet.append("&imageName=" + URLEncoder.encode(param.getImageName()));
-            url = param.getServerUrl() + param.getSaveUrlJsp() + dataSet.toString();
+            dataSet.append("?timeStamp=").append(URLEncoder.encode(param.getTimeStamp(),StandardCharsets.UTF_8.toString()));
+            dataSet.append("&add=").append(URLEncoder.encode(param.getAddress(), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&latitude=").append(URLEncoder.encode(param.getLatitude(), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&longitude=").append(URLEncoder.encode(param.getLongitude(), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&form1=").append(URLEncoder.encode(param.getFm2_rndur(), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&form2=").append(URLEncoder.encode(param.getFm3_wkdth(), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&form3=").append(URLEncoder.encode(param.getFm1_tnsckfwkdth(), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&form4=").append(URLEncoder.encode(param.getFm4_tltjf(), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&form4_check=").append(URLEncoder.encode(param.getFm4_tltjf_check(), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&phoneNo=").append(URLEncoder.encode(param.getPhoneNo(), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&phoneName=").append(URLEncoder.encode(param.getFm1_tnsckfwkdth_auto(), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&imageName=").append(URLEncoder.encode(param.getImageName(), StandardCharsets.UTF_8.toString()));
+            url = param.getServerUrl() + param.getSaveUrlJsp() + dataSet;
         }
 
 

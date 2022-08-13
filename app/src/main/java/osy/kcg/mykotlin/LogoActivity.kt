@@ -38,12 +38,12 @@ class LogoActivity : AppCompatActivity() {
 
     private fun checkVersion() {
         Log.i(TAG, "checkVersion -> start")
-        var version : Int = 0
-        var verString : String ="0"
+        var version = 0
+        var verString: String
         Thread{
             Log.i(TAG, "checkVersion Thread -> start")
             try {
-                verString = HTTP(RV()).VersionCheck(resources.getString(R.string.serverUrl), resources.getString(R.string.versionUrl));
+                verString = HTTP(RV()).VersionCheck(resources.getString(R.string.serverUrl), resources.getString(R.string.versionUrl))
                 Log.i(TAG, "checkVersion : $verString")
                 version = try{
                     Integer.parseInt(verString)
@@ -53,13 +53,13 @@ class LogoActivity : AppCompatActivity() {
             }catch (e:java.lang.Exception){ }
 
 
-            var mContext = this
+            val mContext = this
             object : Handler(Looper.getMainLooper()){
                 override fun handleMessage(msg: Message) {
                     super.handleMessage(msg)
                     if(version != BuildConfig.VERSION_CODE){
                         AlertDialog.Builder(mContext).setTitle("업데이트 권고").setMessage("신규 버전이 출시되었습니다.\n업데이트하시겠습니까?")
-                            .setPositiveButton("확인") { dialog: DialogInterface, _: Int ->
+                            .setPositiveButton("확인") { _: DialogInterface, _: Int ->
                                 object : Handler(Looper.getMainLooper()){
                                     override fun handleMessage(msg: Message) {
                                         super.handleMessage(msg)

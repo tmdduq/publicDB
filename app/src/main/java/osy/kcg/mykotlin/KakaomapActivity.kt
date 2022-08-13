@@ -1,5 +1,6 @@
 package osy.kcg.mykotlin
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.app.ProgressDialog
@@ -63,30 +64,30 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
     class XYRndur internal constructor(var x: Double, var y: Double, var type: String? = null, var id: String?=null)
     private var drawMode = false
     var drawModePoints = mutableListOf<MapPoint>()
-    fun calculDistance(p1:MapPoint, p2:MapPoint) : Double{
-        var lat1 = p1.mapPointGeoCoord.latitude
-        var lon1 = p1.mapPointGeoCoord.longitude
-        var lat2 = p2.mapPointGeoCoord.latitude
-        var lon2 = p2.mapPointGeoCoord.longitude
-        var theta = lon1 - lon2;
-        var dist = sin(deg2rad(lat1)) * sin(deg2rad(lat2)) + cos(deg2rad(lat1)) * cos(deg2rad(lat2)) * cos(deg2rad(theta));
-        dist = acos(dist);
-        dist = rad2deg(dist);
-        dist *= 60 * 1.1515;
-        dist *= 1.609;
-        return dist * 1000; //km -> m
+    private fun calculDistance(p1:MapPoint, p2:MapPoint) : Double{
+        val lat1 = p1.mapPointGeoCoord.latitude
+        val lon1 = p1.mapPointGeoCoord.longitude
+        val lat2 = p2.mapPointGeoCoord.latitude
+        val lon2 = p2.mapPointGeoCoord.longitude
+        val theta = lon1 - lon2
+        var dist = sin(deg2rad(lat1)) * sin(deg2rad(lat2)) + cos(deg2rad(lat1)) * cos(deg2rad(lat2)) * cos(deg2rad(theta))
+        dist = acos(dist)
+        dist = rad2deg(dist)
+        dist *= 60 * 1.1515
+        dist *= 1.609
+        return dist * 1000 //km -> m
     }
 
 
     private fun ccw(p1 : XYRndur, p2 : XYRndur, p3 : XYRndur) =  p1.x*p2.y + p2.x*p3.y + p3.x*p1.y - (p1.x*p3.y + p2.x*p1.y + p3.x*p2.y)
     private fun ccw(p1 : MapPoint, p2 : MapPoint, p3 : MapPoint) : Int{
-        var v = (p1.mapPointGeoCoord.longitude * p2.mapPointGeoCoord.latitude + p2.mapPointGeoCoord.longitude * p3.mapPointGeoCoord.latitude + p3.mapPointGeoCoord.longitude * p1.mapPointGeoCoord.latitude
+        val v = (p1.mapPointGeoCoord.longitude * p2.mapPointGeoCoord.latitude + p2.mapPointGeoCoord.longitude * p3.mapPointGeoCoord.latitude + p3.mapPointGeoCoord.longitude * p1.mapPointGeoCoord.latitude
                 - (p1.mapPointGeoCoord.longitude * p3.mapPointGeoCoord.latitude + p2.mapPointGeoCoord.longitude * p1.mapPointGeoCoord.latitude + p3.mapPointGeoCoord.longitude * p2.mapPointGeoCoord.latitude))
         return if(v>0) 1 else if(v<0) -1 else 0
     }
     private fun isIntersect( p1:MapPoint, p2:MapPoint, p3:MapPoint, p4:MapPoint) : Boolean{
-        var p1p2 =  ccw(p1, p2, p3) * ccw(p1, p2, p4)
-        var p3p4 = ccw(p3, p4, p1) * ccw(p3, p4, p2)
+        val p1p2 =  ccw(p1, p2, p3) * ccw(p1, p2, p4)
+        val p3p4 = ccw(p3, p4, p1) * ccw(p3, p4, p2)
         return p1p2 <= 0 && p3p4<=0
     }
 
@@ -102,12 +103,13 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
     open fun rad2deg(rad: Double) = rad * 180 / Math.PI
 
 
-    fun log(TAG : String, log : String) : Unit{
+    fun log(TAG : String, log : String){
         try {
             object : Handler(Looper.getMainLooper()) {
                 override fun handleMessage(msg: Message) {
                     android.util.Log.i(TAG, log)
-                    binding.kakaoLogTextView.setText("$log\n${binding.kakaoLogTextView.text.toString()}")
+                    val text = "$log${binding.kakaoLogTextView.text.toString()}"
+                    binding.kakaoLogTextView.setText(text)
                 }
             }.sendEmptyMessageDelayed(0,500)
         }catch(e:Exception){e.printStackTrace()}
@@ -241,7 +243,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
         binding.kakaoMaptypeSwapButton.setOnClickListener(this)
         tooltipDialogContents()
 
-        var adapter = ArrayAdapter.createFromResource(this, R.array.rndur, R.layout.spinner_item)
+        val adapter = ArrayAdapter.createFromResource(this, R.array.rndur, R.layout.spinner_item)
         adapter.setDropDownViewResource(R.layout.spinner_item_dropdown)
         binding.kakaoTypeValue.adapter = adapter
         binding.kakaoPnameValue.setOnKeyListener{ v:View?, code:Int?, _:Any?->
@@ -283,7 +285,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
 
         })
 
-        binding.kakaoNameValue.setOnKeyListener{v:View?, code:Int?,event:Any?->
+        binding.kakaoNameValue.setOnKeyListener{ v:View?, code:Int?, _:Any?->
             if(code == KeyEvent.KEYCODE_ENTER){
                 val imm : InputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(v?.windowToken,0)
@@ -295,10 +297,6 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
             override fun handleMessage(msg: Message) {
                 autoTextSize(binding.kakaoAutosizeSupprtTextViewSmall, binding.kakaoPnameValue)
                 binding.kakaoNameValue.textSize = binding.kakaoNameLabel.textSize / (resources.displayMetrics.density)
-            }
-
-            override fun equals(other: Any?): Boolean {
-                return super.equals(other)
             }
         }.sendEmptyMessageDelayed(0,500)
 
@@ -325,7 +323,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
                     binding.kakaoUndoButton.visibility = View.VISIBLE
                     binding.kakaoLayoutForm1.visibility = View.GONE
                     binding.kakaoLayoutForm2.visibility = View.VISIBLE
-                    drawModePoints = mutableListOf<MapPoint>()
+                    drawModePoints = mutableListOf() // mutableListOf<MapPoint>()
                     binding.kakaoTitle.text = "구역정보 생성하기"
                     binding.kakaoAccept2.text = "구역정보 전송하기"
                     binding.kakaoMakeRndurButton.text = " 그리기 종료"
@@ -342,7 +340,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
                     mapView!!.polylines.forEach { p -> if(p.tag==1500) mapView!!.removePolyline(p) }
                     mapView!!.poiItems.forEach { p-> if(p.tag==1501) mapView!!.removePOIItem(p) }
                     Thread{ drawRndur(0,1,2,3, 4, Color.argb(128, 255, 51, 0) ) }.start()
-                    drawModePoints = mutableListOf<MapPoint>()
+                    drawModePoints = mutableListOf()  // mutableListOf<MapPoint>()
                     binding.kakaoTitle.text = "이 위치가 맞으신가요?"
                     binding.kakaoAccept1.text = "위치 입력 완료"
                     binding.kakaoMakeRndurButton.text = " 구역 생성"
@@ -373,14 +371,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
 
                 val pnameValue = binding.kakaoPnameValue.text.toString().replace(Regex(filter), "?")
                 val nameValue = binding.kakaoNameValue.text.toString().replace(Regex(filter), "?")
-
-
-                if(nameValue.contains(Regex(filter))){
-                    val nameValue = binding.kakaoNameValue.text.toString().replace(Regex(filter), "?")
-                    tooltipDialog?.show(this,supportFragmentManager, "checkInput", arrayListOf((TooltipObject(binding.kakaoPnameValue, null, "소속을 채워주세요.",TooltipContentPosition.TOP))) )
-                }
-                if (pnameValue.contains("?") || nameValue.contains("?"))
-                    Snackbar.make(binding.kakaoRootLayout, "특수문자는 삭제되어 전송됩니다.", Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(binding.kakaoRootLayout, "특수문자는 삭제되어 전송됩니다.", Snackbar.LENGTH_SHORT).show()
 
                 var pointValues = StringBuilder("")
                 for (p in drawModePoints)
@@ -423,13 +414,12 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
 
             }
             binding.kakaoLogButton.id ->{
-                var v = binding.kakaoLogTextView
-                if(v.visibility == View.VISIBLE) v.visibility = View.INVISIBLE else v.visibility = View.VISIBLE
+                val kakaoLogButton = binding.kakaoLogTextView
+                if(kakaoLogButton.visibility == View.VISIBLE) kakaoLogButton.visibility = View.INVISIBLE else kakaoLogButton.visibility = View.VISIBLE
             }
             binding.kakaoMaptypeSwapButton.id ->{
                 log(TAG, "mapType Change")
-                var t = mapView!!.mapType
-                when(t){
+                when(mapView!!.mapType){
                     MapView.MapType.Satellite -> {
                         mapView!!.mapType = MapView.MapType.Hybrid
                         binding.kakaoMaptypeSwapButton.text = "하이브리드"
@@ -442,6 +432,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
                         mapView!!.mapType = MapView.MapType.Satellite
                         binding.kakaoMaptypeSwapButton.text = "위성지도"
                     }
+                    else ->{}
                 }
 
             }
@@ -496,6 +487,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
     override fun onStart() {
         super.onStart()
         log(TAG, "HashKey : ${com.kakao.util.maps.helper.Utility.getKeyHash(this)}")
+
         object : AsyncTask<Unit, Unit, Unit>(){
             var asyncDialog = ProgressDialog(mContext)
 
@@ -560,7 +552,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
 
         private fun getInitialLocation(){
         try {
-            var gpsTracker : GpsTracker? = null // 처음 위치 검색을 위한 Google GPS. (1회 사용)
+            val gpsTracker: GpsTracker? // 처음 위치 검색을 위한 Google GPS. (1회 사용)
             gpsTracker = GpsTracker(this)
             latitude = gpsTracker.latitude
             longitude = gpsTracker.longitude
@@ -585,9 +577,9 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
                 val pMap = Polygon()
                 for( r in rndurMap[name]!!) pMap.addPoint(r.x, r.y)
                 if(pMap.isInside(x,y)){
-                    var t = rndurMap[name]
-                    var type = if(t?.get(0)?.type!=null) t?.get(0)?.type else ""
-                    var id = if(t?.get(0)?.id!=null) t?.get(0)?.id else ""
+                    val t = rndurMap[name]
+                    val type = if(t?.get(0)?.type!=null) t[0].type else ""
+                    val id = if(t?.get(0)?.id!=null) t[0].id else ""
 
                     log(TAG, "getMatchPolygon : Matched -> $id/$name ")
                     return arrayOf(name, type, id)
@@ -605,7 +597,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
     private fun drawRndur(NO_INDEX: Int, NAME_INDEX : Int,TYPE_INDEX : Int, LAT_INDEX : Int, LON_INDEX :Int, color : Int){
         try{
             val url = URL(resources.getString(R.string.serverUrl)+ resources.getString(R.string.getPointUrlJsp))
-            var urlConnection = url.openConnection()
+            val urlConnection = url.openConnection()
             urlConnection.connect()
             val inputStream = urlConnection.getInputStream()
             val br = BufferedReader(InputStreamReader(inputStream, "utf-8"))
@@ -670,13 +662,14 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
     }
 
     private fun markerUpdate(){
-        var mapPoint = mapView!!.mapCenterPoint
+        val mapPoint = mapView!!.mapCenterPoint
         val name = getMatchPolygon(mapPoint.mapPointGeoCoord.latitude,mapPoint.mapPointGeoCoord.longitude)
         mapView!!.removePOIItem(marker)
         marker!!.mapPoint = mapPoint
         binding.kakaoAddress2Value.text = name[0]
         marker!!.itemName = name[1]
-        binding.kakaoNameId.text = "ID : ${name[2]}"
+        val text = "ID : ${name[2]}"
+        binding.kakaoNameId.text = text
         mapView!!.addPOIItem(marker)
         mapView!!.selectPOIItem(marker,true)
         log(TAG, "makerUpdate -> ok")
@@ -691,7 +684,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
         longitude = mapPointGeo.longitude
         binding.kakaoLatitudeValue.text = latitude.toString()
         binding.kakaoLongitudeValue.text = longitude.toString()
-        markerUpdate();
+        markerUpdate()
 
 /*
         *//** 카카오 API를 통한 지오코딩. 실패확률이 높아서 보조용으로 사용*//*
@@ -710,17 +703,17 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
 
 
         Thread{
-            var add = HTTP(null).Coord2Address("$latitude","$longitude",resources.getString(R.string.kakaoMapRESTKey),resources.getString(R.string.coord2address))
-            var bundle = Bundle()
-            var message = Message()
+            val add = HTTP(null).Coord2Address("$latitude","$longitude",resources.getString(R.string.kakaoMapRESTKey),resources.getString(R.string.coord2address))
+            val bundle = Bundle()
+            val message = Message()
             message.data = bundle
             if(!add[0].isNullOrEmpty()) bundle.putString("add", add[0]) // 1순위 도로명
             else if(!add[1].isNullOrEmpty()) bundle.putString("add", add[1])    // 2순위 지번
             else{   // 3순위 구글주소
                 try{
                     val address = Geocoder(mContext).getFromLocation(latitude,longitude,7)
-                    val add = address[0].getAddressLine(0)
-                    bundle.putString("add", "(인근)$add")
+                    val add2 = address[0].getAddressLine(0)
+                    bundle.putString("add", "(인근)$add2")
                     log(TAG, "(Std)reversGeo success")
                 }catch(e: IOException){
                     e.printStackTrace()
@@ -806,20 +799,21 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
         var lineLength = .0
         for(i in 1..drawModePoints.size)
             lineLength += calculDistance(drawModePoints[i - 1], drawModePoints[i % drawModePoints.size])
-        binding.kakaoRndurLinelength.text = DecimalFormat("###,###").format(lineLength )+"m"
+        var text = DecimalFormat("###,###").format(lineLength )+"m"
+        binding.kakaoRndurLinelength.text = text
         //Calculate surface Length - End
 
         //Calculate inner size(m²) - start
         var innerArea = .0
-        var referX = drawModePoints[0].mapPointGeoCoord.longitude
-        var referY = drawModePoints[0].mapPointGeoCoord.latitude
+        val referX = drawModePoints[0].mapPointGeoCoord.longitude
+        val referY = drawModePoints[0].mapPointGeoCoord.latitude
         var preX = drawModePoints[1].mapPointGeoCoord.longitude
         var preY = drawModePoints[1].mapPointGeoCoord.latitude
         var centerX = ((referX+preX)* ((referX*preY)-(preX*referY)))
         var centerY = ((referY+preY)* ((referX*preY)-(preX*referY)))
         for( i in 2 until drawModePoints.size){
-            var curX = drawModePoints[i].mapPointGeoCoord.longitude
-            var curY = drawModePoints[i].mapPointGeoCoord.latitude
+            val curX = drawModePoints[i].mapPointGeoCoord.longitude
+            val curY = drawModePoints[i].mapPointGeoCoord.latitude
             var lengthPreX = calculDistance( drawModePoints[i-1], MapPoint.mapPointWithGeoCoord(preY,referX) )
             var lengthCurX = calculDistance( drawModePoints[i], MapPoint.mapPointWithGeoCoord(curY, referX) )
             var lengthPreY = calculDistance( drawModePoints[i-1], MapPoint.mapPointWithGeoCoord(referY ,preX) )
@@ -840,7 +834,8 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
         centerX = centerX / (270000 * innerArea) + referX
         centerY = centerY / (330000 * innerArea) + referY
         innerArea = if(innerArea > 0) innerArea/2 else -innerArea/2
-        binding.kakaoRndurArea.text = DecimalFormat("###,###").format( innerArea )+"m²"
+        text = DecimalFormat("###,###").format( innerArea )+"m²"
+        binding.kakaoRndurArea.text = text
         //Calculate inner size(m²) - End
 
         //create center Marker - start
