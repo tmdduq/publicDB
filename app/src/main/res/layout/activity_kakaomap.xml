@@ -242,7 +242,7 @@
                         android:lines="1"
                         android:background="@drawable/layout_border_gray"
                         android:autoSizeTextType="uniform"
-                        android:text="-미지정-"/>
+                        android:text="-"/>
 
                     <TextView
                         android:id="@+id/kakao_name_id"
@@ -261,6 +261,24 @@
                 android:orientation="horizontal"
                 android:layout_weight="1.2">
 
+                <Button
+                    android:id="@+id/kakao_address3_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/layout_border_label"
+                    android:layout_weight="3"
+                    android:autoSizeTextType="uniform"
+                    android:text="구역현황"/>
+                <Button
+                    android:id="@+id/kakao_address3_value"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="5dp"
+                    android:layout_weight="1"
+                    android:lines="1"
+                    android:background="@drawable/layout_border_gray"
+                    android:autoSizeTextType="uniform"
+                    android:text="-"/>
             </LinearLayout>
 
             <LinearLayout

@@ -1,6 +1,5 @@
 package osy.kcg.mykotlin
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.app.ProgressDialog
@@ -23,7 +22,6 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
-import com.kcg.facillitykotlin.RV
 import io.akndmr.ugly_tooltip.TooltipBuilder
 import io.akndmr.ugly_tooltip.TooltipContentPosition
 import io.akndmr.ugly_tooltip.TooltipDialog
@@ -405,6 +403,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
                     isTransfer = true
                     handler.sendEmptyMessage(1)
                     var result = HTTP(param).DoValuesUpload("point")
+                    log(TAG, "try upload Rndur -> $result")
                     isTransfer = false
                 }.start()
 
@@ -457,7 +456,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
                 0 -> {
                     if(!isTransfer){
                         dialog!!.dismiss()
-                        Snackbar.make(binding.kakaomapView, "구역등록 성공", Snackbar.LENGTH_SHORT).show()
+                        Snackbar.make(binding.kakaomapView, "구역등록", Snackbar.LENGTH_SHORT).show()
                         onClick(binding.kakaoMakeRndurButton)
                         return
                     }
@@ -480,6 +479,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
             }
             override fun afterTextChanged(p0: Editable?) {
                 editText.textSize = textView.textSize / (resources.displayMetrics.density /*+ 0.2f*/)
+                log(TAG, "autoTextSize -> ok")
             }
         })
     }
@@ -591,7 +591,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
             log(TAG, "getMatchPolygon exp: $e")
         }
         log(TAG, "getMatchPolygon -> uncharted")
-        return arrayOf("미지정", "일반", "")
+        return arrayOf("-", "일반", "")
     }
 
     private fun drawRndur(NO_INDEX: Int, NAME_INDEX : Int,TYPE_INDEX : Int, LAT_INDEX : Int, LON_INDEX :Int, color : Int){
@@ -667,6 +667,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
         mapView!!.removePOIItem(marker)
         marker!!.mapPoint = mapPoint
         binding.kakaoAddress2Value.text = name[0]
+        binding.kakaoAddress3Value.text = name[1]
         marker!!.itemName = name[1]
         val text = "ID : ${name[2]}"
         binding.kakaoNameId.text = text
@@ -677,7 +678,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
 
     override fun onMapViewMoveFinished(mapView: MapView?, mapPoint: MapPoint?) {
         if(drawMode) return
-        log(TAG, "★MapView onMapViewMoveFinished")
+        log(TAG, "->MapView onMapViewMoveFinished")
 
         val mapPointGeo = mapPoint!!.mapPointGeoCoord
         latitude = mapPointGeo.latitude
@@ -736,31 +737,31 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
         val mapPointGeo = p1!!.mapPointGeoCoord
         val lat = mapPointGeo.latitude
         val lon = mapPointGeo.longitude
-//        log(TAG, "★MapView " + "onCurrentLocationUpdate ($lat,$lon), accuracy($p2), zoomLevel (${p0!!.zoomLevel}")
+//        log(TAG, "->MapView " + "onCurrentLocationUpdate ($lat,$lon), accuracy($p2), zoomLevel (${p0!!.zoomLevel}")
     }
 
     override fun onCurrentLocationDeviceHeadingUpdate(p0: MapView?, p1: Float) {
-        log(TAG, "★MapView onCurrentLocationDeviceHeadingupdate")
+        log(TAG, "->MapView onCurrentLocationDeviceHeadingupdate")
     }
 
     override fun onCurrentLocationUpdateFailed(p0: MapView?) {
-        log(TAG, "★MapView onCurrentLocationUpdateFailed")
+        log(TAG, "->MapView onCurrentLocationUpdateFailed")
     }
 
     override fun onCurrentLocationUpdateCancelled(p0: MapView?) {
-        log(TAG, "★MapView onCurrentLocationUpdateCancelled")
+        log(TAG, "->MapView onCurrentLocationUpdateCancelled")
     }
 
     override fun onMapViewInitialized(p0: MapView?) {
-        log(TAG, "★MapView onMapViewInitialized")
+        log(TAG, "->MapView onMapViewInitialized")
     }
 
     override fun onMapViewCenterPointMoved(p0: MapView?, p1: MapPoint?) {
-//        log(TAG, "★MapView onMapViewCenterPointMoved")
+//        log(TAG, "->MapView onMapViewCenterPointMoved")
     }
 
     override fun onMapViewZoomLevelChanged(p0: MapView?, p1: Int) {
-//        log(TAG, "★MapView onMapViewZoomLevelChanged")
+//        log(TAG, "->MapView onMapViewZoomLevelChanged")
     }
 
 
@@ -865,7 +866,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
     }
 
     override fun onMapViewSingleTapped(mapView : MapView?, mapPoint: MapPoint?) {
-        log(TAG, "★MapView onMapViewSingleTapped")
+        log(TAG, "MapView onMapViewSingleTapped")
         if(drawMode){
             try {
                 drawModePoints.add(mapPoint!!)
@@ -878,19 +879,19 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
     }
 
     override fun onMapViewDoubleTapped(p0: MapView?, p1: MapPoint?) {
-//        log(TAG, "★MapView onMapViewDoubleTapped")
+//        log(TAG, "->MapView onMapViewDoubleTapped")
     }
 
     override fun onMapViewLongPressed(p0: MapView?, p1: MapPoint?) {
-//        log(TAG, "★MapView onMapViewLongPressed")
+//        log(TAG, "->MapView onMapViewLongPressed")
     }
 
     override fun onMapViewDragStarted(p0: MapView?, p1: MapPoint?) {
-//        log(TAG, "★MapView onMapViewDragStarted")
+//        log(TAG, "->MapView onMapViewDragStarted")
     }
 
     override fun onMapViewDragEnded(p0: MapView?, p1: MapPoint?) {
-//        log(TAG, "★MapView onMapViewDragEnded")
+//        log(TAG, "->MapView onMapViewDragEnded")
     }
 
 }

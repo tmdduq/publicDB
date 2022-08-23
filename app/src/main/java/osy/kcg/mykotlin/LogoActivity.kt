@@ -14,7 +14,6 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.kcg.facillitykotlin.RV
 import osy.kcg.mykotlin.databinding.ActivityLogoBinding
 
 class LogoActivity : AppCompatActivity() {
@@ -57,7 +56,23 @@ class LogoActivity : AppCompatActivity() {
             object : Handler(Looper.getMainLooper()){
                 override fun handleMessage(msg: Message) {
                     super.handleMessage(msg)
-                    if(version != BuildConfig.VERSION_CODE){
+                    if(version == 0){
+                        AlertDialog.Builder(mContext).setTitle("서버 접속 실패").setMessage("서버에 접속할 수 없습니다.\n업데이트하시겠습니까?")
+                            .setPositiveButton("확인") { _: DialogInterface, _: Int ->
+                                object : Handler(Looper.getMainLooper()){
+                                    override fun handleMessage(msg: Message) {
+                                        super.handleMessage(msg)
+                                        try {
+                                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
+                                        } catch (anfe: ActivityNotFoundException) {
+                                            startActivity(Intent(Intent.ACTION_VIEW,Uri.parse("https://play.google.com/store/apps/details?id=$packageName")))}
+                                        finish()
+                                    }
+                                }.sendEmptyMessage(1)
+                            }.setCancelable(false)
+                            .create().show()
+                    }
+                    else if(version != BuildConfig.VERSION_CODE){
                         AlertDialog.Builder(mContext).setTitle("업데이트 권고").setMessage("신규 버전이 출시되었습니다.\n업데이트하시겠습니까?")
                             .setPositiveButton("확인") { _: DialogInterface, _: Int ->
                                 object : Handler(Looper.getMainLooper()){

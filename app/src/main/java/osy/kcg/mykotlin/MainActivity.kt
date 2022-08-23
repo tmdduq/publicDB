@@ -26,7 +26,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.snackbar.Snackbar
-import com.kcg.facillitykotlin.RV
 import io.akndmr.ugly_tooltip.TooltipBuilder
 import io.akndmr.ugly_tooltip.TooltipContentPosition
 import io.akndmr.ugly_tooltip.TooltipDialog

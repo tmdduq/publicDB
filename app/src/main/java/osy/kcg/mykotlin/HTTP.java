@@ -1,7 +1,7 @@
 package osy.kcg.mykotlin;
 
 import android.util.Log;
-import com.kcg.facillitykotlin.RV;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.io.BufferedReader;
@@ -144,6 +144,7 @@ public class HTTP {
         try {
             URL connectUrl = new URL(serverUrl + versionUrl);
             URLConnection urlConnection = connectUrl.openConnection();
+            urlConnection.setConnectTimeout(3000);
             InputStreamReader ir = new InputStreamReader(urlConnection.getInputStream());
             BufferedReader br = new BufferedReader(ir);
             return br.readLine();
