@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/facility_main_layout"
+    android:id="@+id/fallcar_main_layout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
@@ -34,7 +34,7 @@
                 android:layout_margin="10dp" />
 
             <EditText
-                android:id="@+id/facility_logView"
+                android:id="@+id/fallcar_logView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="10dp"
@@ -65,7 +65,7 @@
                 android:maxLines="1" />
 
             <Button
-                android:id="@+id/facility_help"
+                android:id="@+id/fallcar_help"
                 android:layout_width="70dp"
                 android:layout_height="30dp"
                 android:layout_gravity="top|right"
@@ -79,7 +79,7 @@
         </FrameLayout>
 
         <TextView
-            android:id="@+id/facility_address"
+            android:id="@+id/fallcar_address"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1.16"
@@ -99,7 +99,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:id="@+id/facility_xy_layout"
+                android:id="@+id/fallcar_xy_layout"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="3dp"
                 android:layout_weight="1"
@@ -112,7 +112,7 @@
                     android:orientation="horizontal">
 
                     <Button
-                        android:id="@+id/facility_longitude_label"
+                        android:id="@+id/fallcar_longitude_label"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_margin="3dp"
@@ -123,7 +123,7 @@
                         android:text="위도" />
 
                     <Button
-                        android:id="@+id/facility_longitude_value"
+                        android:id="@+id/fallcar_longitude_value"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_margin="3dp"
@@ -141,7 +141,7 @@
                     android:orientation="horizontal">
 
                     <Button
-                        android:id="@+id/facility_latitude_label"
+                        android:id="@+id/fallcar_latitude_label"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_margin="3dp"
@@ -152,7 +152,7 @@
                         android:text="경도" />
 
                     <Button
-                        android:id="@+id/facility_latitude_value"
+                        android:id="@+id/fallcar_latitude_value"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_margin="3dp"
@@ -165,7 +165,7 @@
             </LinearLayout>
 
             <Button
-                android:id="@+id/facility_takePic"
+                android:id="@+id/fallcar_takePic"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="3dp"
@@ -187,7 +187,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="0.755"
-            android:id="@+id/facility_contents"
+            android:id="@+id/fallcar_contents"
             android:orientation="vertical">
 
         <LinearLayout
@@ -197,7 +197,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/facility_pname_type_label"
+                android:id="@+id/fallcar_pname_type_label"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
@@ -212,7 +212,7 @@
                 android:layout_weight="0.3">
 
                 <TextView
-                    android:id="@+id/facility_autosize_supprt_textView_small"
+                    android:id="@+id/fallcar_autosize_supprt_textView_small"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
@@ -222,7 +222,7 @@
                     android:visibility="invisible" />
 
                 <osy.kcg.utils.MyAutoCompleteTextView
-                    android:id="@+id/facility_pname_value"
+                    android:id="@+id/fallcar_pname_value"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
@@ -235,7 +235,7 @@
             </FrameLayout>
 
             <Button
-                android:id="@+id/facility_district_type_value"
+                android:id="@+id/fallcar_district_type_value"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
@@ -257,7 +257,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/facility_placename_label"
+                android:id="@+id/fallcar_placename_label"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
@@ -274,7 +274,7 @@
                 android:layout_weight="1">
 
                 <TextView
-                    android:id="@+id/facility_autosize_supprt_textView"
+                    android:id="@+id/fallcar_autosize_supprt_textView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
@@ -283,7 +283,7 @@
                     android:visibility="invisible" />
 
                 <EditText
-                    android:id="@+id/facility_placename_value"
+                    android:id="@+id/fallcar_placename_value"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
@@ -304,7 +304,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/facility_position_label"
+                android:id="@+id/fallcar_position_label"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
@@ -315,7 +315,7 @@
                 android:text="장소유형" />
 
             <Spinner
-                android:id="@+id/facility_position_value"
+                android:id="@+id/fallcar_position_value"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
@@ -330,50 +330,25 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1.1"
-            android:orientation="horizontal"
-            android:visibility="invisible">
+            android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/facility_facility_type_label"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="5dp"
-                android:layout_weight="1.6"
-
-                android:autoSizeTextType="uniform"
-                android:background="@drawable/layout_border_label"
-                android:text="시설분류" />
-
-            <Spinner
-                android:id="@+id/facility_facility_type_value"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:entries="@array/tltjf"
-                android:background="@drawable/layout_border"
-                android:paddingLeft="10dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_margin="3dp"
                 android:layout_weight="1.7"
-                android:orientation="vertical">
+                android:orientation="horizontal">
 
-                <Button
+                <Spinner
+                    android:id="@+id/fallcar_point_type"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_weight="1"
                     android:background="@drawable/layout_border"
-                    android:clickable="false"
-                    android:textSize="10sp" />
-                <CheckBox
-                    android:id="@+id/facility_break_checkbox"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:visibility="invisible"
-                    android:background="@drawable/layout_border"
-                    android:clickable="false"
+                    android:entries="@array/fallcar"
+                    android:layout_margin="5dp"
+                    android:checked="true"
+                    android:gravity="center"
                     android:textSize="10sp" />
 
 

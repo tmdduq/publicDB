@@ -48,7 +48,19 @@
             android:windowSoftInputMode="adjustPan"/>
 
         <activity
-            android:name="osy.kcg.mykotlin.HelpActivity"
+            android:name="osy.kcg.mykotlin.Kakaomap2Activity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:windowSoftInputMode="adjustPan"/>
+
+        <activity
+            android:name="osy.kcg.mykotlin.LobbyActivity"
+            android:windowSoftInputMode="adjustPan"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="true">
+        </activity>
+
+        <activity
+            android:name="osy.kcg.mykotlin.FallCarActivity"
             android:windowSoftInputMode="adjustPan"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true">

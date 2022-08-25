@@ -4,11 +4,9 @@ import android.app.Activity
 import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.Context
-import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.location.Geocoder
 import android.os.*
 import android.text.Editable
 import android.text.TextWatcher
@@ -27,10 +25,9 @@ import net.daum.mf.map.api.MapPOIItem
 import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapPolyline
 import net.daum.mf.map.api.MapView
-import osy.kcg.mykotlin.databinding.ActivityKakaomapBinding
+import osy.kcg.mykotlin.databinding.ActivityKakaomap2Binding
 import osy.kcg.utils.SoundSearcher
 import java.io.BufferedReader
-import java.io.IOException
 import java.io.InputStreamReader
 import java.net.URL
 import java.text.DecimalFormat
@@ -42,7 +39,7 @@ import kotlin.math.sin
 import kotlin.random.Random
 
 
-open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventListener, MapView.MapViewEventListener, View.OnClickListener{
+open class Kakaomap2Activity : AppCompatActivity(), MapView.CurrentLocationEventListener, MapView.MapViewEventListener, View.OnClickListener{
 
     companion object{
         const val TAG ="KakaomapActivity"
@@ -51,12 +48,10 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
         const val type = 18
         const val upTime = 19
         const val point = 20
-
     }
 
-
     private var mapView : MapView? = null   // mapView
-    var marker : MapPOIItem? = null // 시설위치지정 마커 (레드)
+
     var mContext : Context? = null  // Acticvity Context
     var latitude = .0   // Lat
     var longitude = .0  // Lon
@@ -64,9 +59,9 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
     var tooltipDialog : TooltipDialog? = null
 
     private var rndurMap = HashMap<String, ArrayList<XYRndur>>()
-    lateinit var binding: ActivityKakaomapBinding
+    lateinit var binding: ActivityKakaomap2Binding
     class XYRndur internal constructor(var x: Double, var y: Double, var type: String? = null, var id: String?=null)
-    private var drawMode = false
+
     var drawModePoints = mutableListOf<MapPoint>()
     private fun calculDistance(p1:MapPoint, p2:MapPoint) : Double{
         val lat1 = p1.mapPointGeoCoord.latitude
@@ -82,8 +77,6 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
         return dist * 1000 //km -> m
     }
 
-
-    private fun ccw(p1 : XYRndur, p2 : XYRndur, p3 : XYRndur) =  p1.x*p2.y + p2.x*p3.y + p3.x*p1.y - (p1.x*p3.y + p2.x*p1.y + p3.x*p2.y)
     private fun ccw(p1 : MapPoint, p2 : MapPoint, p3 : MapPoint) : Int{
         val v = (p1.mapPointGeoCoord.longitude * p2.mapPointGeoCoord.latitude + p2.mapPointGeoCoord.longitude * p3.mapPointGeoCoord.latitude + p3.mapPointGeoCoord.longitude * p1.mapPointGeoCoord.latitude
                 - (p1.mapPointGeoCoord.longitude * p3.mapPointGeoCoord.latitude + p2.mapPointGeoCoord.longitude * p1.mapPointGeoCoord.latitude + p3.mapPointGeoCoord.longitude * p2.mapPointGeoCoord.latitude))
@@ -94,10 +87,6 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
         val p3p4 = ccw(p3, p4, p1) * ccw(p3, p4, p2)
         return p1p2 <= 0 && p3p4<=0
     }
-
-
-
-
 
     private var mapViewContainer : ViewGroup? = null
 
@@ -113,8 +102,8 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
             object : Handler(Looper.getMainLooper()) {
                 override fun handleMessage(msg: Message) {
                     android.util.Log.i(TAG, log)
-                    val text = "$log\n${binding.kakaoLogTextView.text.toString()}"
-                    binding.kakaoLogTextView.setText(text)
+                    val text = "$log\n${binding.kakao2LogTextView.text.toString()}"
+                    binding.kakao2LogTextView.setText(text)
                 }
             }.sendEmptyMessageDelayed(0,500)
         }catch(e:Exception){e.printStackTrace()}
@@ -122,7 +111,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityKakaomapBinding.inflate(layoutInflater)
+        binding = ActivityKakaomap2Binding.inflate(layoutInflater)
         setContentView(binding.root)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
         mContext = this
@@ -150,89 +139,47 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
             .build()
     }
     private fun tooltipDialogContents(){
-
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
-            binding.kakaoHelp.setOnClickListener {
-                if(drawMode){
-                    val tooltips: ArrayList<TooltipObject> = ArrayList()
-                    tooltips.add(
-                        TooltipObject(
-                            view = binding.kakaomapView,
-                            title = "① 구역 그리기",
-                            text = "<font color=\"#FFC300\">지도를 짧게 터치</font>하여 구역을 그릴 수 있어요.<br><font color=\"#FFC300\">3개 이상 포인트</font>를 표시해주세요.",
-                            tooltipContentPosition = TooltipContentPosition.BOTTOM
-                        )
-                    )
-                    tooltips.add(
-                        TooltipObject(
-                            binding.kakaoPnameValue,
-                            "② 소속","당신의 <font color=\"#FFC300\">소속</font>은 어디인가요?",
-                            TooltipContentPosition.TOP)
-                    )
-                    tooltips.add(
-                        TooltipObject(
-                            binding.kakaoTypeValue,
-                            "③ 구역정보",
-                            "이 구역은 <font color=\"#FFC300\">무슨 구역</font>이에요? 선택해 주세요.",
-                            TooltipContentPosition.BOTTOM)
-                    )
-                    tooltips.add(
-                        TooltipObject(
-                            binding.kakaoNameValue,
-                            "④ 상세정보",
-                            "사진의 구역이 주소만으로는 이해하기 어려워요. <br><font color=\"#FFC300\">주소엔 표시되지 않는 위치</font>를 상세하게 입력해주세요.",
-                            TooltipContentPosition.TOP)
-                    )
-                    tooltips.add(
-                        TooltipObject(
-                            binding.kakaoAccept1,
-                            "마지막!",
-                            "이 버튼을 누르면 구역정보가 저장돼요",
-                            TooltipContentPosition.TOP)
-                    )
-                    tooltipDialog?.show(this, supportFragmentManager, "SHOWCASE_TAG", tooltips)
-                }
+            binding.kakao2Help.setOnClickListener {
 
-                if(!drawMode){
-                    val tooltips: ArrayList<TooltipObject> = ArrayList()
-                    tooltips.add(
-                        TooltipObject(
-                            view = binding.kakaomapView,
-                            title = "① 위치 지정",
-                            text = "촬영한 <font color=\"#FFC300\">시설물 위치</font>를 최대한 <font color=\"#FFC300\">정확하게 지정</font>해주세요.",
-                            tooltipContentPosition = TooltipContentPosition.BOTTOM
-                        )
+                val tooltips: ArrayList<TooltipObject> = ArrayList()
+                tooltips.add(
+                    TooltipObject(
+                        view = binding.kakao2mapView,
+                        title = "① 구역 그리기",
+                        text = "<font color=\"#FFC300\">지도를 짧게 터치</font>하여 구역을 그릴 수 있어요.<br><font color=\"#FFC300\">3개 이상 포인트</font>를 표시해주세요.",
+                        tooltipContentPosition = TooltipContentPosition.BOTTOM
                     )
-                    tooltips.add(
-                        TooltipObject(
-                            binding.kakaoMaptypeSwapButton,
-                            "①₁ 지도변경","위치구분이 어렵나요? 위성지도도 볼 수 있어요.",
-                            TooltipContentPosition.BOTTOM)
-                    )
-                    tooltips.add(
-                        TooltipObject(
-                            binding.kakaoAddress2Value,
-                            "② 구역정보",
-                            "구역에 대한 정보가 표시돼요. <br>혹시..관리중인 구역인가요?",
-                            TooltipContentPosition.TOP)
-                    )
-                    tooltips.add(
-                        TooltipObject(
-                            binding.kakaoMakeRndurButton,
-                            "②₂ 구역추가",
-                            "관리중인 구역인데 지도에 표시가 안된다면 여기서 <font color=\"#FFC300\">구역을 생성</font>해 주세요.",
-                            TooltipContentPosition.BOTTOM)
-                    )
-                    tooltips.add(
-                        TooltipObject(
-                            binding.kakaoAccept1,
-                            "마지막!",
-                            "이 버튼을 누르면 위치가 저장돼요.",
-                            TooltipContentPosition.TOP)
-                    )
-                    tooltipDialog?.show(this, supportFragmentManager, "SHOWCASE_TAG", tooltips)
-                }
-
+                )
+                tooltips.add(
+                    TooltipObject(
+                        binding.kakao2PnameValue,
+                        "② 소속","당신의 <font color=\"#FFC300\">소속</font>은 어디인가요?",
+                        TooltipContentPosition.TOP)
+                )
+                tooltips.add(
+                    TooltipObject(
+                        binding.kakao2TypeValue,
+                        "③ 구역정보",
+                        "이 구역은 <font color=\"#FFC300\">무슨 구역</font>이에요? 선택해 주세요.",
+                        TooltipContentPosition.BOTTOM)
+                )
+                tooltips.add(
+                    TooltipObject(
+                        binding.kakao2NameValue,
+                        "④ 상세정보",
+                        "사진의 구역이 주소만으로는 이해하기 어려워요. <br><font color=\"#FFC300\">주소엔 표시되지 않는 위치</font>를 상세하게 입력해주세요.",
+                        TooltipContentPosition.TOP)
+                )
+                tooltips.add(
+                    TooltipObject(
+                        binding.kakao2Accept2,
+                        "마지막!",
+                        "이 버튼을 누르면 구역정보가 저장돼요",
+                        TooltipContentPosition.TOP)
+                )
+                tooltipDialog?.show(this, supportFragmentManager, "SHOWCASE_TAG", tooltips)
+            
             }
         }
     }
@@ -240,22 +187,20 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
 
 
     private fun attachLinstener() {
-        binding.kakaoMakeRndurButton.setOnClickListener(this)
-        binding.kakaoUndoButton.setOnClickListener(this)
-        binding.kakaoAccept1.setOnClickListener(this)
-        binding.kakaoAccept2.setOnClickListener(this)
-        binding.kakaoLogButton.setOnClickListener(this)
-        binding.kakaoMaptypeSwapButton.setOnClickListener(this)
+        binding.kakao2UndoButton.setOnClickListener(this)
+        binding.kakao2Accept2.setOnClickListener(this)
+        binding.kakao2LogButton.setOnClickListener(this)
+        binding.kakao2MaptypeSwapButton.setOnClickListener(this)
         tooltipDialogContents()
 
         var adapter = ArrayAdapter.createFromResource(this, R.array.rndur, R.layout.spinner_item)
         adapter.setDropDownViewResource(R.layout.spinner_item_dropdown)
-        binding.kakaoTypeValue.adapter = adapter
+        binding.kakao2TypeValue.adapter = adapter
         adapter = ArrayAdapter.createFromResource(this, R.array.wkdth, R.layout.spinner_item)
         adapter.setDropDownViewResource(R.layout.spinner_item_dropdown)
-        binding.kakaoPlaceType.adapter = adapter
+        binding.kakao2PlaceType.adapter = adapter
 
-        binding.kakaoPnameValue.setOnKeyListener{ v:View?, code:Int?, _:Any?->
+        binding.kakao2PnameValue.setOnKeyListener{ v:View?, code:Int?, _:Any?->
             if(code == KeyEvent.KEYCODE_ENTER){
                 val imm : InputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(v?.windowToken,0)
@@ -263,7 +208,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
             }
             return@setOnKeyListener false
         }
-        binding.kakaoPnameValue.addTextChangedListener(object : TextWatcher{
+        binding.kakao2PnameValue.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
 
@@ -271,30 +216,30 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
             }
 
             override fun afterTextChanged(p0: Editable?) {
-                if(binding.kakaoPnameValue.text.isEmpty()) return
+                if(binding.kakao2PnameValue.text.isEmpty()) return
                 val rstList = ArrayList<String>()
 
                 for( i in 0 until resources.getStringArray(R.array.pName).size){
                     val pName = resources.getStringArray(R.array.pName)[i]
-                    val bResult = SoundSearcher().matchString(pName, binding.kakaoPnameValue.text.toString())
+                    val bResult = SoundSearcher().matchString(pName, binding.kakao2PnameValue.text.toString())
                     if(bResult) rstList.add(pName)
                 }
                 if(rstList.size>0){
                     val rstItem = arrayOfNulls<String>(rstList.size)
                     rstList.toArray(rstItem)
-                    binding.kakaoPnameValue.setAdapter(ArrayAdapter<String>(this@KakaomapActivity, R.layout.spinner_item_dropdown, rstItem))
-                    binding.kakaoPnameValue.showDropDown()
+                    binding.kakao2PnameValue.setAdapter(ArrayAdapter<String>(this@Kakaomap2Activity, R.layout.spinner_item_dropdown, rstItem))
+                    binding.kakao2PnameValue.showDropDown()
                     if(rstList.size<5) (getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager)
-                    .hideSoftInputFromWindow(binding.kakaoPnameValue.windowToken,0)
+                        .hideSoftInputFromWindow(binding.kakao2PnameValue.windowToken,0)
                     return
                 }
-                binding.kakaoPnameValue.dismissDropDown()
+                binding.kakao2PnameValue.dismissDropDown()
                 return
             }
 
         })
 
-        binding.kakaoNameValue.setOnKeyListener{ v:View?, code:Int?, _:Any?->
+        binding.kakao2NameValue.setOnKeyListener{ v:View?, code:Int?, _:Any?->
             if(code == KeyEvent.KEYCODE_ENTER){
                 val imm : InputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(v?.windowToken,0)
@@ -304,14 +249,8 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
         }
         object : Handler(Looper.getMainLooper()){
             override fun handleMessage(msg: Message) {
-                autoTextSize(binding.kakaoAutosizeSupprtTextViewSmall, binding.kakaoPnameValue)
-                binding.kakaoNameValue.textSize = binding.kakaoNameLabel.textSize / (resources.displayMetrics.density)
-            }
-        }.sendEmptyMessageDelayed(0,500)
-        object : Handler(Looper.getMainLooper()){
-            override fun handleMessage(msg: Message) {
-                autoTextSize(binding.kakaoAutosizeSupprtTextViewLarge, binding.kakaoAddress2Value)
-                binding.kakaoAddress2Value.textSize = binding.kakaoNameLabel.textSize / (resources.displayMetrics.density)
+                autoTextSize(binding.kakao2AutosizeSupprtTextViewSmall, binding.kakao2PnameValue)
+                binding.kakao2NameValue.textSize = binding.kakao2NameLabel.textSize / (resources.displayMetrics.density)
             }
         }.sendEmptyMessageDelayed(0,500)
 
@@ -331,62 +270,18 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
 
     override fun onClick(v: View) {
         when(v.id){
-            binding.kakaoMakeRndurButton.id ->{
-                drawMode = !drawMode
-                log(TAG, "drawMode -> $drawMode")
-                if(drawMode){ // ON
-                    binding.kakaoUndoButton.visibility = View.VISIBLE
-                    binding.kakaoLayoutForm1.visibility = View.GONE
-                    binding.kakaoLayoutForm2.visibility = View.VISIBLE
-                    drawModePoints = mutableListOf() // mutableListOf<MapPoint>()
-                    binding.kakaoTitle.text = "구역정보 생성하기"
-                    binding.kakaoAccept2.text = "구역정보 전송하기"
-                    binding.kakaoMakeRndurButton.text = " 그리기 종료"
-                    binding.kakaoRootLayout.setBackgroundColor(Color.argb(40,255,230,130))
-                    binding.xpng.visibility = View.INVISIBLE
-                    binding.xpngGuide.text = "터치로 구역을 설정하세요."
-                }
-                else{   // OFF
-                    binding.kakaoUndoButton.visibility = View.INVISIBLE
-                    binding.kakaoLayoutForm2.visibility = View.GONE
-                    binding.kakaoLayoutForm1.visibility = View.VISIBLE
 
-                    mapView!!.poiItems.forEach { p-> if(p.tag==1000) mapView!!.removePOIItem(p) }
-                    mapView!!.polylines.forEach { p -> if(p.tag==1500) mapView!!.removePolyline(p) }
-                    mapView!!.poiItems.forEach { p-> if(p.tag==1501) mapView!!.removePOIItem(p) }
-                    Thread{ drawRndur(0,1,2,3, 4, Color.argb(128, 255, 51, 0) ) }.start()
-                    drawModePoints = mutableListOf()  // mutableListOf<MapPoint>()
-                    binding.kakaoTitle.text = "이 위치가 맞으신가요?"
-                    binding.kakaoAccept1.text = "위치 입력 완료"
-                    binding.kakaoMakeRndurButton.text = " 구역 생성"
-
-                    binding.kakaoRootLayout.setBackgroundColor(Color.argb(0,0,0,0))
-                    binding.xpng.visibility = View.VISIBLE
-                    binding.xpngGuide.text = "여기에 맞춰주세요."
-                }
-            }
-            binding.kakaoAccept1.id -> {
-                val intent = Intent("osy.kcg.myKotlin")
-                intent.putExtra("latitude", binding.kakaoLatitudeValue.text)
-                intent.putExtra("longitude", binding.kakaoLongitudeValue.text)
-                intent.putExtra("address", binding.kakaoAddressValue.text)
-                intent.putExtra("type", marker!!.itemName)
-                intent.putExtra("name", binding.kakaoAddress2Value.text)
-
-                sendBroadcast(intent)
-                finish()
-            }
-            binding.kakaoUndoButton.id -> {
+            binding.kakao2UndoButton.id -> {
                 if(drawModePoints.isEmpty()) return
                 drawModePoints.removeAt(drawModePoints.size-1)
                 drawPolygon()
             }
-            binding.kakaoAccept2.id -> {
+            binding.kakao2Accept2.id -> {
                 val filter = "[^\uAC00-\uD7AFxfe0-9a-zA-Z\\s.,/()!@+~?><;*:\"'\\-\u3131-\u3163]"
 
-                val pnameValue = binding.kakaoPnameValue.text.toString().replace(Regex(filter), "?")
-                val nameValue = binding.kakaoNameValue.text.toString().replace(Regex(filter), "?")
-                Snackbar.make(binding.kakaoRootLayout, "특수문자는 삭제되어 전송됩니다.", Snackbar.LENGTH_SHORT).show()
+                val pnameValue = binding.kakao2PnameValue.text.toString().replace(Regex(filter), "?")
+                val nameValue = binding.kakao2NameValue.text.toString().replace(Regex(filter), "?")
+                Snackbar.make(binding.kakao2RootLayout, "특수문자는 삭제되어 전송됩니다.", Snackbar.LENGTH_SHORT).show()
 
                 var pointValues = StringBuilder("")
                 for (p in drawModePoints)
@@ -398,10 +293,10 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
                 var isPname = false
                 resources.getStringArray(R.array.pName).forEach { if(it == pnameValue) isPname = true }
                 when{
-                    drawModePoints.size < 3 -> tooltips.add(TooltipObject(binding.kakaomapView, null, "3개 지점 이상 선택해주세요.",TooltipContentPosition.BOTTOM))
-                    !isPname -> tooltips.add(TooltipObject(binding.kakaoPnameValue, null, "소속을 알맞게 채워주세요.",TooltipContentPosition.TOP))
-                    binding.kakaoTypeValue.selectedItemPosition == 0 -> tooltips.add(TooltipObject( binding.kakaoTypeValue, null, "구역을 선택하세요.", TooltipContentPosition.TOP))
-                    nameValue.length < 2 -> tooltips.add(TooltipObject(binding.kakaoNameValue, null, "장소설명을 입력하세요.", TooltipContentPosition.TOP))
+                    drawModePoints.size < 3 -> tooltips.add(TooltipObject(binding.kakao2mapView, null, "3개 지점 이상 선택해주세요.",TooltipContentPosition.BOTTOM))
+                    !isPname -> tooltips.add(TooltipObject(binding.kakao2PnameValue, null, "소속을 알맞게 채워주세요.",TooltipContentPosition.TOP))
+                    binding.kakao2TypeValue.selectedItemPosition == 0 -> tooltips.add(TooltipObject( binding.kakao2TypeValue, null, "구역을 선택하세요.", TooltipContentPosition.TOP))
+                    nameValue.length < 2 -> tooltips.add(TooltipObject(binding.kakao2NameValue, null, "장소설명을 입력하세요.", TooltipContentPosition.TOP))
                 }
                 if(tooltips.size>0){
                     tooltipDialog?.show(this,supportFragmentManager,"checkInput",tooltips)
@@ -411,7 +306,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
                 val param : HashMap<Int, String> = hashMapOf(
                     name to nameValue, pname to pnameValue,
                     point to pointValues.toString(),
-                    type to (binding.kakaoTypeValue.selectedItem.toString()),
+                    type to (binding.kakao2TypeValue.selectedItem.toString()),
                     upTime to SimpleDateFormat("yyyyMMddHHmmss", Locale.KOREA).format(Calendar.getInstance().timeInMillis)
                 )
 
@@ -425,36 +320,32 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
                     var result = HTTP(param, resources.getString(R.string.serverUrl)).DoValuesUpload("point", resources.getString(R.string.savePointUrlJsp))
                     dialog!!.dismiss()
                     if(result == 10)
-                        Snackbar.make(binding.kakaomapView, "구역등록 성공", Snackbar.LENGTH_SHORT).show()
+                        Snackbar.make(binding.kakao2mapView, "구역등록 성공", Snackbar.LENGTH_SHORT).show()
                     else
-                        Snackbar.make(binding.kakaomapView, "등록실패 (ERROR $result)", Snackbar.LENGTH_SHORT).show()
+                        Snackbar.make(binding.kakao2mapView, "등록실패 (ERROR $result)", Snackbar.LENGTH_SHORT).show()
+                    resetUI.sendEmptyMessageDelayed(0,1000)
                     log(TAG, "try upload Rndur -> $result")
-                    clickkakaoMakeRndurButtonHandler.sendEmptyMessage(0)
                 }.start()
 
-                binding.kakaoPnameValue.setText("")
-                binding.kakaoNameValue.setText("")
-                binding.kakaoTypeValue.setSelection(0)
-
             }
-            binding.kakaoLogButton.id ->{
-                val kakaoLogButton = binding.kakaoLogTextView
+            binding.kakao2LogButton.id ->{
+                val kakaoLogButton = binding.kakao2LogTextView
                 if(kakaoLogButton.visibility == View.VISIBLE) kakaoLogButton.visibility = View.INVISIBLE else kakaoLogButton.visibility = View.VISIBLE
             }
-            binding.kakaoMaptypeSwapButton.id ->{
+            binding.kakao2MaptypeSwapButton.id ->{
                 log(TAG, "mapType Change")
                 when(mapView!!.mapType){
                     MapView.MapType.Satellite -> {
                         mapView!!.mapType = MapView.MapType.Hybrid
-                        binding.kakaoMaptypeSwapButton.text = "하이브리드"
+                        binding.kakao2MaptypeSwapButton.text = "하이브리드"
                     }
                     MapView.MapType.Hybrid -> {
                         mapView!!.mapType = MapView.MapType.Standard
-                        binding.kakaoMaptypeSwapButton.text = "일반지도"
+                        binding.kakao2MaptypeSwapButton.text = "일반지도"
                     }
                     MapView.MapType.Standard -> {
                         mapView!!.mapType = MapView.MapType.Satellite
-                        binding.kakaoMaptypeSwapButton.text = "위성지도"
+                        binding.kakao2MaptypeSwapButton.text = "위성지도"
                     }
                     else ->{}
                 }
@@ -465,35 +356,42 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
             }
         }
     }
-    private var clickkakaoMakeRndurButtonHandler = object : Handler(Looper.getMainLooper()){
+    private var resetUI = object : Handler(Looper.getMainLooper()){
         override fun handleMessage(msg: Message) {
             super.handleMessage(msg)
-            onClick(binding.kakaoMakeRndurButton)
+            binding.kakao2PnameValue.setText("")
+            binding.kakao2NameValue.setText("")
+            binding.kakao2TypeValue.setSelection(0)
+
+            mapView!!.poiItems.forEach { p-> if(p.tag==1000) mapView!!.removePOIItem(p) }
+            mapView!!.polylines.forEach { p -> if(p.tag==1500) mapView!!.removePolyline(p) }
+            mapView!!.poiItems.forEach { p-> if(p.tag==1501) mapView!!.removePOIItem(p) }
+            Thread{ drawRndur(0,1,2,3, 4, Color.argb(128, 255, 51, 0) ) }.start()
+            drawModePoints = mutableListOf()  // mutableListOf<MapPoint>()
+
         }
     }
 
     private fun autoTextSize(textView: TextView, view : View){
         val editText : EditText = view as EditText
-        //textView.setText("가나", TextView.BufferType.EDITABLE)
         editText.textSize = textView.textSize / (resources.displayMetrics.density /*+ 0.2f*/)
 
         editText.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                try {
-                    val text = if (p0?.isEmpty() == true) editText.hint.toString() else p0.toString()
-                    textView.setText(text, TextView.BufferType.EDITABLE)
-                }catch(e: Exception){log(TAG, "autoTextSize Error : $e")}
+                val text = if (p0?.isEmpty() == true) editText.hint.toString() else p0.toString()
+                textView.setText(text, TextView.BufferType.EDITABLE)
             }
             override fun afterTextChanged(p0: Editable?) {
                 editText.textSize = textView.textSize / (resources.displayMetrics.density /*+ 0.2f*/)
+                log(TAG, "autoTextSize -> ok")
             }
         })
     }
 
     override fun onStart() {
         super.onStart()
-        log(TAG, "HashKey : ${com.kakao.util.maps.helper.Utility.getKeyHash(this)}")
+//        log(TAG, "HashKey : ${com.kakao.util.maps.helper.Utility.getKeyHash(this)}")
 
         object : AsyncTask<Unit, Unit, Unit>(){
             var asyncDialog = ProgressDialog(mContext)
@@ -527,14 +425,13 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
     private fun loadMapView(){
         try{
             mapView = MapView(mContext)
-            mapViewContainer = binding.kakaomapView
+            mapViewContainer = binding.kakao2mapView
             mapViewContainer!!.addView(mapView)
             mapView!!.setCurrentLocationEventListener(this)
             mapView!!.setMapViewEventListener(this)
             mapView!!.currentLocationTrackingMode = MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeadingWithoutMapMoving
             mapView!!.setZoomLevelFloat( -0.168175f, true)
-
-            createMapMaker()
+            
             getInitialLocation()
             Thread{ drawRndur(0,1,2,3, 4, Color.argb(128, 255, 51, 0))   }.start()
 
@@ -545,19 +442,9 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
         log(TAG, "loadMapView -> ok")
     }
 
-    private fun createMapMaker(){
-        marker = MapPOIItem()
-        marker!!.tag = 1001
-        marker!!.markerType = MapPOIItem.MarkerType.RedPin // 기본으로 제공하는 RedPin 마커 모양.
-        marker!!.selectedMarkerType = MapPOIItem.MarkerType.RedPin // 마커를 클릭했을때, 기본으로 제공하는 RedPin 마커 모양.
-        marker!!.showAnimationType = MapPOIItem.ShowAnimationType.SpringFromGround
-        marker!!.isShowDisclosureButtonOnCalloutBalloon = false
-        log(TAG, "createMapMaker -> ok")
-    }
 
 
-
-        private fun getInitialLocation(){
+    private fun getInitialLocation(){
         try {
             val gpsTracker: GpsTracker? // 처음 위치 검색을 위한 Google GPS. (1회 사용)
             gpsTracker = GpsTracker(this)
@@ -566,40 +453,11 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
 
             val mapPoint = MapPoint.mapPointWithGeoCoord(latitude, longitude)
             mapView!!.setMapCenterPoint(mapPoint, true)
-            marker!!.mapPoint = mapPoint
-            mapView!!.addPOIItem(marker)
-            mapView!!.selectPOIItem(marker, true)
-            val matchPolygonName = getMatchPolygon(latitude, longitude)
-            binding.kakaoAddress2Value.setText(matchPolygonName[0])
-            marker!!.itemName = matchPolygonName[1]
+            
         }catch (e : Exception){log(TAG, "getInitialLocation Exp: $e")}
-            log(TAG, "getInitialLocation ->: ok")
+        log(TAG, "getInitialLocation ->: ok")
     }
 
-    private fun getMatchPolygon(x:Double, y:Double): Array<String?> {
-        try{
-            val rndurIterator = rndurMap.keys.iterator()
-            while(rndurIterator.hasNext()){
-                val name = rndurIterator.next()
-                val pMap = Polygon()
-                for( r in rndurMap[name]!!) pMap.addPoint(r.x, r.y)
-                if(pMap.isInside(x,y)){
-                    val t = rndurMap[name]
-                    val type = if(t?.get(0)?.type!=null) t[0].type else ""
-                    val id = if(t?.get(0)?.id!=null) t[0].id else ""
-
-                    log(TAG, "getMatchPolygon : Matched -> $id ")
-                    return arrayOf(name, type, id)
-
-                }
-            }
-        }catch(e:Exception){
-            e.printStackTrace()
-            log(TAG, "getMatchPolygon exp: $e")
-        }
-        log(TAG, "getMatchPolygon -> uncharted")
-        return arrayOf("-", "일반", "")
-    }
 
     private fun drawRndur(NO_INDEX: Int, NAME_INDEX : Int,TYPE_INDEX : Int, LAT_INDEX : Int, LON_INDEX :Int, color : Int){
         try{
@@ -665,118 +523,15 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
             e.printStackTrace()
             log(TAG,"drawRndur2 exp: $e")
         }
-        markerUpdate()
     }
-
-    private fun markerUpdate(){
-        try {
-            val mapPoint = mapView!!.mapCenterPoint
-            val name = getMatchPolygon(
-                mapPoint.mapPointGeoCoord.latitude,
-                mapPoint.mapPointGeoCoord.longitude
-            )
-            mapView!!.removePOIItem(marker)
-            marker!!.mapPoint = mapPoint
-            binding.kakaoAddress2Value.setText(name[0])
-            binding.kakaoAddress3Value.text = name[1]
-            marker!!.itemName = name[1]
-            val text = "ID : ${name[2]}"
-            binding.kakaoNameId.text = text
-            mapView!!.addPOIItem(marker)
-            mapView!!.selectPOIItem(marker, true)
-            log(TAG, "makerUpdate -> ok")
-        }catch(e:Exception){log(TAG, "makerUpdate Error -> $e")}
-    }
-
-    override fun onMapViewMoveFinished(mapView: MapView?, mapPoint: MapPoint?) {
-        if(drawMode) return
-        log(TAG, "->MapView onMapViewMoveFinished")
-
-        val mapPointGeo = mapPoint!!.mapPointGeoCoord
-        latitude = mapPointGeo.latitude
-        longitude = mapPointGeo.longitude
-        binding.kakaoLatitudeValue.text = latitude.toString()
-        binding.kakaoLongitudeValue.text = longitude.toString()
-        markerUpdate()
-
-/*
-        *//** 카카오 API를 통한 지오코딩. 실패확률이 높아서 보조용으로 사용*//*
-        val reverseGeoCoder = MapReverseGeoCoder(resources.getString(R.string.kakaoMapKey), mapPoint, object : MapReverseGeoCoder.ReverseGeoCodingResultListener{
-                override fun onReverseGeoCoderFoundAddress(p0: MapReverseGeoCoder?, s: String?) {
-                    log(TAG, "(Kao)reversGeo success")
-                    binding.kakaoAddressValue.text = s
-                }
-                override fun onReverseGeoCoderFailedToFindAddress(p0: MapReverseGeoCoder?) {
-                    log(TAG, "(Kao)reversGeo fail")
-                }
-            }, this)
-        Thread{
-            log(TAG, "(Kao)reversGeo start")
-            reverseGeoCoder.startFindingAddress()}.start()*/
-
-
-        Thread{
-            val add = HTTP(null,resources.getString(R.string.serverUrl)).
-                Coord2Address("$latitude","$longitude",resources.getString(R.string.kakaoMapRESTKey),resources.getString(R.string.coord2address))
-            val bundle = Bundle()
-            val message = Message()
-            message.data = bundle
-            if(!add[0].isNullOrEmpty()) bundle.putString("add", add[0]) // 1순위 도로명
-            else if(!add[1].isNullOrEmpty()) bundle.putString("add", add[1])    // 2순위 지번
-            else{   // 3순위 구글주소
-                try{
-                    val address = Geocoder(mContext).getFromLocation(latitude,longitude,7)
-                    val add2 = address[0].getAddressLine(0)
-                    bundle.putString("add", "(인근)$add2")
-                    log(TAG, "(Std)reversGeo success")
-                }catch(e: IOException){
-                    e.printStackTrace()
-                    log(TAG, "(Std)reversGeo exp: $e")
-                }catch(e: IndexOutOfBoundsException){
-                    e.printStackTrace()
-                    log(TAG, "(Std)reversGeo notFound")
-                }
-            }
-            object : Handler(Looper.getMainLooper()){
-                override fun handleMessage(msg: Message) {
-                    binding.kakaoAddressValue.text = msg.data.getString("add")
-                }
-            }.sendMessage(message)
-        }.start()
-    }
+    
 
     override fun onCurrentLocationUpdate(p0: MapView?, p1: MapPoint?, p2: Float) {
-        //kakao로 처음 가져온 위치. 오차가 너무 커서 사용안하고 구글 위치로 대체했음.
         val mapPointGeo = p1!!.mapPointGeoCoord
-        val lat = mapPointGeo.latitude
-        val lon = mapPointGeo.longitude
-//        log(TAG, "->MapView " + "onCurrentLocationUpdate ($lat,$lon), accuracy($p2), zoomLevel (${p0!!.zoomLevel}")
-    }
+        latitude =  mapPointGeo.latitude
+        longitude = mapPointGeo.longitude
 
-    override fun onCurrentLocationDeviceHeadingUpdate(p0: MapView?, p1: Float) {
-        log(TAG, "->MapView onCurrentLocationDeviceHeadingupdate")
     }
-
-    override fun onCurrentLocationUpdateFailed(p0: MapView?) {
-        log(TAG, "->MapView onCurrentLocationUpdateFailed")
-    }
-
-    override fun onCurrentLocationUpdateCancelled(p0: MapView?) {
-        log(TAG, "->MapView onCurrentLocationUpdateCancelled")
-    }
-
-    override fun onMapViewInitialized(p0: MapView?) {
-        log(TAG, "->MapView onMapViewInitialized")
-    }
-
-    override fun onMapViewCenterPointMoved(p0: MapView?, p1: MapPoint?) {
-//        log(TAG, "->MapView onMapViewCenterPointMoved")
-    }
-
-    override fun onMapViewZoomLevelChanged(p0: MapView?, p1: Int) {
-//        log(TAG, "->MapView onMapViewZoomLevelChanged")
-    }
-
 
     private fun drawPolygon(){
         mapView!!.polylines.forEach {if(it.tag==1500) mapView!!.removePolyline(it) }
@@ -804,8 +559,8 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
         // Create Yellow Maker - End
 
         if(drawModePoints.size < 3) {
-            binding.kakaoRndurLinelength.text = ""
-            binding.kakaoRndurArea.text = ""
+            binding.kakao2RndurLinelength.text = ""
+            binding.kakao2RndurArea.text = ""
             return
         }
 
@@ -814,7 +569,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
         for(i in 1..drawModePoints.size)
             lineLength += calculDistance(drawModePoints[i - 1], drawModePoints[i % drawModePoints.size])
         var text = DecimalFormat("###,###").format(lineLength )+"m"
-        binding.kakaoRndurLinelength.text = text
+        binding.kakao2RndurLinelength.text = text
         //Calculate surface Length - End
 
         //Calculate inner size(m²) - start
@@ -848,8 +603,8 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
         centerX = centerX / (270000 * innerArea) + referX
         centerY = centerY / (330000 * innerArea) + referY
         innerArea = if(innerArea > 0) innerArea/2 else -innerArea/2
-        text = DecimalFormat("###,###.##").format( (innerArea/1000) )+"km²"
-        binding.kakaoRndurArea.text = text
+        text = DecimalFormat("###,###.##").format(  (innerArea/1000) )+"km²"
+        binding.kakao2RndurArea.text = text
         //Calculate inner size(m²) - End
 
         //create center Marker - start
@@ -872,39 +627,29 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
                 if(isIntersect(drawModePoints[j-1], drawModePoints[j], drawModePoints[drawModePoints.size-2], drawModePoints[drawModePoints.size-1])) isCrossLine = true
         }
         if(isCrossLine){
-            tooltipDialog?.show(this,supportFragmentManager, "checkInput", arrayListOf((TooltipObject(binding.xpng, null, "선을 교차해서 그릴 수 없어요.",TooltipContentPosition.TOP))) )
-            onClick(binding.kakaoUndoButton)
+            tooltipDialog?.show(this,supportFragmentManager, "checkInput", arrayListOf((TooltipObject(binding.kakao2mapView, null, "선을 교차해서 그릴 수 없어요.",TooltipContentPosition.BOTTOM))) )
+            onClick(binding.kakao2UndoButton)
         }
         // Polygon Validity Check - End
     }
 
     override fun onMapViewSingleTapped(mapView : MapView?, mapPoint: MapPoint?) {
-        log(TAG, "MapView onMapViewSingleTapped")
-        if(drawMode){
-            try {
-                drawModePoints.add(mapPoint!!)
-                drawPolygon()
-                return
-            }catch(e : Exception){log(TAG, "onMapViewSingleTapped exp : $e")}
-        }
-        mapView!!.removePOIItem(marker)
-        mapView.setMapCenterPoint(mapPoint, true)
-    }
+        log(TAG, "${mapPoint!!.mapPointGeoCoord.latitude}, ${mapPoint!!.mapPointGeoCoord.longitude}")
+        try {
+            drawModePoints.add(mapPoint!!)
+            drawPolygon()
+        }catch(e : Exception){log(TAG, "onMapViewSingleTapped exp : $e")}
 
-    override fun onMapViewDoubleTapped(p0: MapView?, p1: MapPoint?) {
-//        log(TAG, "->MapView onMapViewDoubleTapped")
     }
-
-    override fun onMapViewLongPressed(p0: MapView?, p1: MapPoint?) {
-//        log(TAG, "->MapView onMapViewLongPressed")
-    }
-
-    override fun onMapViewDragStarted(p0: MapView?, p1: MapPoint?) {
-//        log(TAG, "->MapView onMapViewDragStarted")
-    }
-
-    override fun onMapViewDragEnded(p0: MapView?, p1: MapPoint?) {
-//        log(TAG, "->MapView onMapViewDragEnded")
-    }
-
+    override fun onCurrentLocationDeviceHeadingUpdate(p0: MapView?, p1: Float) {}
+    override fun onCurrentLocationUpdateFailed(p0: MapView?) {}
+    override fun onCurrentLocationUpdateCancelled(p0: MapView?) {}
+    override fun onMapViewInitialized(p0: MapView?) {}
+    override fun onMapViewCenterPointMoved(p0: MapView?, p1: MapPoint?) {}
+    override fun onMapViewZoomLevelChanged(p0: MapView?, p1: Int) {}
+    override fun onMapViewMoveFinished(mapView: MapView?, mapPoint: MapPoint?) {}
+    override fun onMapViewDoubleTapped(p0: MapView?, p1: MapPoint?) {}
+    override fun onMapViewLongPressed(p0: MapView?, p1: MapPoint?) {}
+    override fun onMapViewDragStarted(p0: MapView?, p1: MapPoint?) {}
+    override fun onMapViewDragEnded(p0: MapView?, p1: MapPoint?) {}
 }

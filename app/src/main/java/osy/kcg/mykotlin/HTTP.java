@@ -16,17 +16,20 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 public class HTTP {
     final String TAG = "HTTP";
-    RV param;
+    Map<Integer,String> param ;
+    String serverUrl;
 
-    public HTTP(RV param){
+    public HTTP(Map<Integer,String> param, String serverUrl){
         this.param = param;
+        this.serverUrl = serverUrl;
     }
 
-    public int DoFileUpload(String absolutePath) {
-        String apiUrl = param.getServerUrl() + param.getImageUploadUrlJsp();
+    public int DoFileUpload(String absolutePath, String imageUploadUrlJsp) {
+        String apiUrl = serverUrl + imageUploadUrlJsp;
         return HttpFileUpload(apiUrl, "", absolutePath);
     }
 
@@ -108,51 +111,49 @@ public class HTTP {
         return TRANSFER_RESULT;
     }
 
-    public int DoValuesUpload(String activityName) throws UnsupportedEncodingException {
+    public int DoValuesUpload(String activityName, String jspUrl) throws UnsupportedEncodingException {
         StringBuilder dataSet = new StringBuilder();
         String url;
         if(activityName.contains("point")) {
-            dataSet.append("?upTime=").append(URLEncoder.encode(param.getKa_upTime(), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&name=").append(URLEncoder.encode(param.getKa_name(), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&pname=").append(URLEncoder.encode(param.getKa_pname(), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&type=").append(URLEncoder.encode(param.getKa_type(), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&point=").append(URLEncoder.encode(param.getKa_point(), StandardCharsets.UTF_8.toString()));
-            url = param.getServerUrl() + param.getSavePointUrlJsp() + dataSet;
+            dataSet.append("?upTime=").append(URLEncoder.encode(param.get(KakaomapActivity.upTime), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&name=").append(URLEncoder.encode(param.get(KakaomapActivity.name), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&pname=").append(URLEncoder.encode(param.get(KakaomapActivity.pname), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&type=").append(URLEncoder.encode(param.get(KakaomapActivity.type), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&point=").append(URLEncoder.encode(param.get(KakaomapActivity.point), StandardCharsets.UTF_8.toString()));
         }
         else{
-            dataSet.append("?timeStamp=").append(URLEncoder.encode(param.getTimeStamp(),StandardCharsets.UTF_8.toString()));
-            dataSet.append("&add=").append(URLEncoder.encode(param.getAddress(), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&latitude=").append(URLEncoder.encode(param.getLatitude(), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&longitude=").append(URLEncoder.encode(param.getLongitude(), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&form1=").append(URLEncoder.encode(param.getFm2_rndur(), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&form2=").append(URLEncoder.encode(param.getFm3_wkdth(), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&form3=").append(URLEncoder.encode(param.getFm1_tnsckfwkdth(), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&form4=").append(URLEncoder.encode(param.getFm4_tltjf(), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&form4_check=").append(URLEncoder.encode(param.getFm4_tltjf_check(), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&phoneNo=").append(URLEncoder.encode(param.getPhoneNo(), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&phoneName=").append(URLEncoder.encode(param.getFm1_tnsckfwkdth_auto(), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&imageName=").append(URLEncoder.encode(param.getImageName(), StandardCharsets.UTF_8.toString()));
-            url = param.getServerUrl() + param.getSaveUrlJsp() + dataSet;
+            dataSet.append("?timeStamp=").append(URLEncoder.encode(param.get(MainActivity.timeStamp),StandardCharsets.UTF_8.toString()));
+            dataSet.append("&add=").append(URLEncoder.encode(param.get(MainActivity.address), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&latitude=").append(URLEncoder.encode(param.get(MainActivity.latitude), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&longitude=").append(URLEncoder.encode(param.get(MainActivity.longitude), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&form1=").append(URLEncoder.encode(param.get(MainActivity.fm2_rndur), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&form2=").append(URLEncoder.encode(param.get(MainActivity.fm3_wkdth), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&form3=").append(URLEncoder.encode(param.get(MainActivity.fm1_tnsckfwkdth), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&form4=").append(URLEncoder.encode(param.get(MainActivity.fm4_tltjf), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&phoneNo=").append(URLEncoder.encode(param.get(MainActivity.phoneNo), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&phoneName=").append(URLEncoder.encode(param.get(MainActivity.fm1_tnsckfwkdth_auto), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&imageName=").append(URLEncoder.encode(param.get(MainActivity.imageName), StandardCharsets.UTF_8.toString()));
         }
+        url = serverUrl + jspUrl + dataSet;
 
 
         Log.d(TAG, "DoValuesUpload() - URL : "+ url);
         return HttpValuesUpload(url);
     }
 
-    public String VersionCheck(String serverUrl, String versionUrl){
+    public int VersionCheck(String versionUrl){
         try {
             URL connectUrl = new URL(serverUrl + versionUrl);
             URLConnection urlConnection = connectUrl.openConnection();
             urlConnection.setConnectTimeout(3000);
             InputStreamReader ir = new InputStreamReader(urlConnection.getInputStream());
             BufferedReader br = new BufferedReader(ir);
-            return br.readLine();
+            return Integer.parseInt(br.readLine());
         } catch (Exception e) {
             Log.d(TAG, "VersionCheck - "+e);
             e.printStackTrace();
+            return -1;
         }
-        return null;
     }
 
     public int HttpValuesUpload(String url){

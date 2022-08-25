@@ -2,24 +2,29 @@ package osy.kcg.mykotlin
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.Dialog
 import android.content.ActivityNotFoundException
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.*
 import android.util.Log
 import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import osy.kcg.mykotlin.databinding.ActivityLogoBinding
 
 class LogoActivity : AppCompatActivity() {
     private var TAG = "LogoActivity"
-    private lateinit var binding: ActivityLogoBinding
+    private var dialog : Dialog? = null
 
+    private lateinit var binding: ActivityLogoBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,36 +33,56 @@ class LogoActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         attachListener()
+        checkVersion()
     }
 
-    override fun onStart() {
-        super.onStart()
-        checkVersion()
+    private fun dialogControl(YN : Boolean){
+        if(YN){
+            dialog = Dialog(this)
+            dialog!!.window!!.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            dialog!!.setContentView(ProgressBar(this))
+            dialog!!.setCanceledOnTouchOutside(false)
+            dialog!!.show()
+        }
+        else
+            dialog!!.dismiss()
     }
 
     private fun checkVersion() {
         Log.i(TAG, "checkVersion -> start")
         var version = 0
-        var verString: String
+        dialogControl(true)
         Thread{
             Log.i(TAG, "checkVersion Thread -> start")
             try {
-                verString = HTTP(RV()).VersionCheck(resources.getString(R.string.serverUrl), resources.getString(R.string.versionUrl))
-                Log.i(TAG, "checkVersion : $verString")
-                version = try{
-                    Integer.parseInt(verString)
-                }catch(e: Exception){
-                    0
-                }
-            }catch (e:java.lang.Exception){ }
-
+                version = HTTP(null, resources.getString(R.string.serverUrl))
+                    .VersionCheck(resources.getString(R.string.versionUrl))
+                Log.i(TAG, "checkVersion : $version")
+            }catch (e:Exception){ }
 
             val mContext = this
             object : Handler(Looper.getMainLooper()){
                 override fun handleMessage(msg: Message) {
                     super.handleMessage(msg)
+                    dialogControl(false)
                     if(version == 0){
                         AlertDialog.Builder(mContext).setTitle("서버 접속 실패").setMessage("서버에 접속할 수 없습니다.\n업데이트하시겠습니까?")
+                            .setPositiveButton("확인") { _: DialogInterface, _: Int ->
+                                object : Handler(Looper.getMainLooper()){
+                                    override fun handleMessage(msg: Message) {
+                                        super.handleMessage(msg)
+                                        try {
+                                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
+                                        } catch (anfe: ActivityNotFoundException) {
+                                            startActivity(Intent(Intent.ACTION_VIEW,Uri.parse("https://play.google.com/store/apps/details?id=$packageName")))}
+                                        finish()
+                                    }
+                                }.sendEmptyMessage(1)
+                            }.setCancelable(false)
+                            .create().show()
+                    }
+                    else if(version % 10 == 0){
+                        AlertDialog.Builder(mContext).setTitle("업데이트 필요").setMessage("업데이트를 반드시 해야합니다.\n업데이트하시겠습니까?")
                             .setPositiveButton("확인") { _: DialogInterface, _: Int ->
                                 object : Handler(Looper.getMainLooper()){
                                     override fun handleMessage(msg: Message) {
@@ -103,8 +128,9 @@ class LogoActivity : AppCompatActivity() {
             when( binding.logoCodeEditText.text.toString().uppercase() ){
                 "" -> Toast.makeText(this, "코드를 입력하세요.", Toast.LENGTH_SHORT).show()
                 resources.getString(R.string.loginCode) -> {
-                    val intent = Intent(this, MainActivity::class.java)
+                    val intent = Intent(this, LobbyActivity::class.java)
                     startActivity(intent)
+                    overridePendingTransition(R.anim.fadein, R.anim.fadeout)
                     finish()
                 }
                 else -> Toast.makeText(this, "코드가 틀렸습니다.", Toast.LENGTH_SHORT).show()

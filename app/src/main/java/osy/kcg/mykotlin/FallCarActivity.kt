@@ -31,6 +31,7 @@ import io.akndmr.ugly_tooltip.TooltipContentPosition
 import io.akndmr.ugly_tooltip.TooltipDialog
 import io.akndmr.ugly_tooltip.TooltipObject
 import osy.kcg.mykotlin.databinding.ActivityFacillityBinding
+import osy.kcg.mykotlin.databinding.ActivityFallcarBinding
 import osy.kcg.utils.SoundSearcher
 import java.io.File
 import java.io.IOException
@@ -39,7 +40,7 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 
-open class MainActivity : AppCompatActivity(), View.OnClickListener {
+open class FallCarActivity : AppCompatActivity(), View.OnClickListener {
 
     companion object {
         const val TAG = "MainActivity";
@@ -52,7 +53,6 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
         const val fm2_rndur = 7
         const val fm3_wkdth = 8
         const val fm4_tltjf = 9
-//        const val fm4_tltjf_check = 10
         const val phoneNo = 11
         const val phoneName = 12
         const val imageName = 13
@@ -61,9 +61,9 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
     var logTextView : EditText? = null
 
     var param : HashMap<Int, String> = hashMapOf(
-            timeStamp to "", address to "", latitude to "", longitude to "", fm1_tnsckfwkdth to "", fm1_tnsckfwkdth_auto to "",
-            fm2_rndur to "", fm3_wkdth to "", fm4_tltjf to "",  phoneNo to "", phoneName to "", imageName to ""
-        )
+        timeStamp to "", address to "", latitude to "", longitude to "", fm1_tnsckfwkdth to "", fm1_tnsckfwkdth_auto to "",
+        fm2_rndur to "", fm3_wkdth to "", fm4_tltjf to "", phoneNo to "", phoneName to "", imageName to ""
+    )
 
 
     var isRunningThread = false
@@ -71,7 +71,7 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
     var tryCount : Int = 0
     var tooltipDialog : TooltipDialog? = null
 
-    lateinit var binding : ActivityFacillityBinding
+    lateinit var binding : ActivityFallcarBinding
 
     protected fun log(TAG: String, log: String){
         try {
@@ -90,11 +90,11 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
-        binding = ActivityFacillityBinding.inflate(layoutInflater)
+        binding = ActivityFallcarBinding.inflate(layoutInflater)
         setContentView(binding.root)
         log(TAG,"onCreate")
         mContext = this
-        logTextView = binding.facilityLogView
+        logTextView = binding.fallcarLogView
 
         attachClickListner()
         requestPermission()
@@ -134,11 +134,11 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
     private fun tooltipDialogContents(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
-            binding.facilityHelp.setOnClickListener {
+            binding.fallcarHelp.setOnClickListener {
                 val tooltips: ArrayList<TooltipObject> = ArrayList()
                 tooltips.add(//C:\Users\Osy\AndroidStudioProjects\myKotlin\app\src\main\res\mipmap-hdpi\xpng.png
                     TooltipObject(
-                        view = binding.facilityTakePic,
+                        view = binding.fallcarTakePic,
                         title = "① 사진촬영",
                         text = "등록하고 싶은 <font color=\"#FFC300\">시설물</font>을 카메라로 <font color=\"#FFC300\">촬영</font>해주세요.",
                         tooltipContentPosition = TooltipContentPosition.TOP,
@@ -151,29 +151,29 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
                         "② 사진확인","<font color=\"#FFC300\">촬영한 사진</font>이 잘 나왔는지, 흔들리지는 않았는지 <font color=\"#FFC300\">확인</font>해주세요.",
                         TooltipContentPosition.BOTTOM))
                 tooltips.add(TooltipObject(
-                    binding.facilityContents,
+                    binding.fallcarContents,
                     "③ 부가정보 입력",
                     "등록한 사진의 <font color=\"#FFC300\">정보</font>를 <font color=\"#FFC300\">채워해야요.</font> ",
                     TooltipContentPosition.TOP))
                 tooltips.add(TooltipObject(
-                    binding.facilityPnameValue,
+                    binding.fallcarPnameValue,
                     "③₁ 소속",
                     "당신이 <font color=\"#FFC300\">어디 소속</font>인지 적어주세요.",
                     TooltipContentPosition.BOTTOM))
                 tooltips.add(TooltipObject(
-                    binding.facilityPlacenameValue,
+                    binding.fallcarPlacenameValue,
                     "③₂장소설명",
                     "사진의 장소가 주소만으로는 이해하기 어려워요. <font color=\"#FFC300\">주소엔 표시되지 않는 위치</font>를 상세하게 입력해주세요.",
                     TooltipContentPosition.BOTTOM))
                 tooltips.add(TooltipObject(
-                    binding.facilityPositionValue,
+                    binding.fallcarPositionValue,
                     "③₃장소분류",
                     "이 장소는 <font color=\"#FFC300\">어떤 장소로 분류</font>되는지 선택해 주세요.",
                     TooltipContentPosition.TOP))
                 tooltips.add(TooltipObject(
-                    binding.facilityFacilityTypeValue,
-                    "",//""③₄시설분류",
-                    "",//"<font color=\"#FFC300\">어떤 시설물</font>인가요? 목록에서 고르면 돼요.",
+                    binding.fallcarPointType,
+                    "③₄어떤 걸 촬영하셨나요?",
+                    "차량이 <font color=\"#FFC300\">추락한 위치</font>인가요? 아니면 추락한 곳 근처에 있는 <font color=\"#FFC300\">표지판</font> 인가요?",
                     TooltipContentPosition.TOP))
                 tooltips.add(TooltipObject(
                     binding.tltjfanfTransfer,"마지막!",
@@ -190,28 +190,27 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     @SuppressLint("NewApi")
     private fun attachClickListner(){
-        binding.facilityTakePic.setOnClickListener(this)
-        binding.facilityLongitudeLabel.setOnClickListener(this)
-        binding.facilityLongitudeValue.setOnClickListener(this)
-        binding.facilityLatitudeLabel.setOnClickListener(this)
-        binding.facilityLatitudeValue.setOnClickListener(this)
-        binding.facilityPlacenameLabel.setOnClickListener(this)
-        binding.facilityDistrictTypeValue.setOnClickListener(this)
-        binding.facilityPositionLabel.setOnClickListener(this)
+        binding.fallcarTakePic.setOnClickListener(this)
+        binding.fallcarLongitudeLabel.setOnClickListener(this)
+        binding.fallcarLongitudeValue.setOnClickListener(this)
+        binding.fallcarLatitudeLabel.setOnClickListener(this)
+        binding.fallcarLatitudeValue.setOnClickListener(this)
+        binding.fallcarPlacenameLabel.setOnClickListener(this)
+        binding.fallcarDistrictTypeValue.setOnClickListener(this)
+        binding.fallcarPositionLabel.setOnClickListener(this)
         binding.tltjfanfTransfer.setOnClickListener(this)
-        binding.facilityFacilityTypeLabel.setOnClickListener(this)
         binding.setting.setOnClickListener(this)
         binding.editXy.setOnClickListener(this)
         tooltipDialogContents()
 
         var adapter = ArrayAdapter.createFromResource(this, R.array.wkdth, R.layout.spinner_item)
         adapter.setDropDownViewResource(R.layout.spinner_item_dropdown)
-        binding.facilityPositionValue.adapter = adapter
-//        adapter = ArrayAdapter.createFromResource(this, R.array.tltjf, R.layout.spinner_item)
-//        adapter.setDropDownViewResource(R.layout.spinner_item_dropdown)
-//        binding.facilityFacilityTypeValue.adapter = adapter
+        binding.fallcarPositionValue.adapter = adapter
+        adapter = ArrayAdapter.createFromResource(this, R.array.fallcar, R.layout.spinner_item)
+        adapter.setDropDownViewResource(R.layout.spinner_item_dropdown)
+        binding.fallcarPointType.adapter = adapter
 
-        binding.facilityPlacenameValue.setOnKeyListener{ v: View?, code: Int?, _: Any? ->
+        binding.fallcarPlacenameValue.setOnKeyListener{ v: View?, code: Int?, _: Any? ->
             if(code == KeyEvent.KEYCODE_ENTER){
                 val imm : InputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(v?.windowToken,0)
@@ -221,30 +220,29 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
 
         object:Handler(Looper.myLooper()!!){override fun handleMessage(msg: Message) {
-            binding.facilityPnameValue.textSize = binding.facilityAutosizeSupprtTextViewSmall.textSize / (resources.displayMetrics.density)
-            binding.facilityPlacenameValue.textSize = binding.facilityPlacenameLabel.textSize / (resources.displayMetrics.density)
+            binding.fallcarPnameValue.textSize = binding.fallcarAutosizeSupprtTextViewSmall.textSize / (resources.displayMetrics.density)
         }
         }.sendEmptyMessageDelayed(0,500)
 
-        binding.facilityPnameValue.addTextChangedListener(object : TextWatcher{
+        binding.fallcarPnameValue.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                val text = if (p0?.isEmpty() == true) binding.facilityPnameValue.hint.toString() else p0.toString()
-                binding.facilityAutosizeSupprtTextViewSmall.setText(text, TextView.BufferType.EDITABLE)
+                val text = if (p0?.isEmpty() == true) binding.fallcarPnameValue.hint.toString() else p0.toString()
+                binding.fallcarAutosizeSupprtTextViewSmall.setText(text, TextView.BufferType.EDITABLE)
             }
             override fun afterTextChanged(p0: Editable?) {
                 object:Handler(Looper.myLooper()!!){override fun handleMessage(msg: Message) {
-                    binding.facilityPnameValue.textSize = binding.facilityAutosizeSupprtTextViewSmall.textSize / (resources.displayMetrics.density)
-                    }
+                    binding.fallcarPnameValue.textSize = binding.fallcarAutosizeSupprtTextViewSmall.textSize / (resources.displayMetrics.density)
+                }
                 }.sendEmptyMessageDelayed(0,500)
                 runFirstComplete()
-                val string = binding.facilityPnameValue.text.toString()
+                val string = binding.fallcarPnameValue.text.toString()
 
                 resources.getStringArray(R.array.pName).iterator().forEach {
                     if(it==string) {
                         (getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager)
-                            .hideSoftInputFromWindow(binding.facilityPnameValue.windowToken,0)
+                            .hideSoftInputFromWindow(binding.fallcarPnameValue.windowToken,0)
                         return@forEach
                     }
                 }
@@ -252,7 +250,7 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
         })
 
-        binding.facilityPnameValue.setOnKeyListener{v:View?, code:Int?,_:Any?->
+        binding.fallcarPnameValue.setOnKeyListener{v:View?, code:Int?,_:Any?->
             if(code == KeyEvent.KEYCODE_ENTER){
                 val imm : InputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(v?.windowToken,0)
@@ -260,28 +258,28 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
             }
             return@setOnKeyListener false
         }
-    log(TAG,"attachClickListner -> ok")
+        log(TAG,"attachClickListner -> ok")
     }
 
     private fun runFirstComplete(){
-        if(binding.facilityPnameValue.text.isEmpty()) return
+        if(binding.fallcarPnameValue.text.isEmpty()) return
 
         val rstList = ArrayList<String>()
 
         for( i in 0 until resources.getStringArray(R.array.pName).size){
             val pName = resources.getStringArray(R.array.pName)[i]
-            val bResult = SoundSearcher().matchString(pName, binding.facilityPnameValue.text.toString())
+            val bResult = SoundSearcher().matchString(pName, binding.fallcarPnameValue.text.toString())
             if(bResult) rstList.add(pName)
         }
 
         if(rstList.size>0){
             val rstItem = arrayOfNulls<String>(rstList.size)
             rstList.toArray(rstItem)
-            binding.facilityPnameValue.setAdapter(ArrayAdapter<String>(this, R.layout.spinner_item_dropdown, rstItem))
-            binding.facilityPnameValue.showDropDown()
+            binding.fallcarPnameValue.setAdapter(ArrayAdapter<String>(this, R.layout.spinner_item_dropdown, rstItem))
+            binding.fallcarPnameValue.showDropDown()
             return
         }
-        binding.facilityPnameValue.dismissDropDown()
+        binding.fallcarPnameValue.dismissDropDown()
         return
     }
 
@@ -291,21 +289,20 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
         val filter = "[^\uAC00-\uD7AFxfe0-9a-zA-Z\\s.,/()!@+~?><;*:\"'\\-\u3131-\u3163]"
 
         param[timeStamp] = SimpleDateFormat("yyyyMMddHHmmss", Locale.KOREA).format(System.currentTimeMillis())
-        param[address] = binding.facilityAddress.text.toString()
-        param[latitude] = binding.facilityLatitudeValue.text.toString()
-        param[longitude] = binding.facilityLongitudeValue.text.toString()
+        param[address] = binding.fallcarAddress.text.toString()
+        param[latitude] = binding.fallcarLatitudeValue.text.toString()
+        param[longitude] = binding.fallcarLongitudeValue.text.toString()
 
-        param[fm1_tnsckfwkdth] = binding.facilityPlacenameValue.text.toString()
+        param[fm1_tnsckfwkdth] = binding.fallcarPlacenameValue.text.toString()
         param[fm1_tnsckfwkdth] = param[fm1_tnsckfwkdth]!!.replace(filter, "?")
-        binding.facilityPlacenameValue.setText(param[fm1_tnsckfwkdth])
+        binding.fallcarPlacenameValue.setText(param[fm1_tnsckfwkdth])
 
 
-        param[fm1_tnsckfwkdth_auto] = binding.facilityPnameValue.text.toString()
+        param[fm1_tnsckfwkdth_auto] = binding.fallcarPnameValue.text.toString()
 
-        param[fm2_rndur] = binding.facilityDistrictTypeValue.text.toString()
-        param[fm3_wkdth] = binding.facilityPositionValue.selectedItem.toString()
-        param[fm4_tltjf] = binding.facilityFacilityTypeValue.selectedItem.toString()
-//        param[fm4_tltjf_check] = if(binding.facilityBreakCheckbox.isChecked) "O" else "X"
+        param[fm2_rndur] = binding.fallcarDistrictTypeValue.text.toString()
+        param[fm3_wkdth] = binding.fallcarPositionValue.selectedItem.toString()
+        param[fm4_tltjf] = if(binding.fallcarPointType.selectedItemPosition == 1) "추락지점" else "표지판"
 
         val telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
         param[phoneNo] = telephonyManager.line1Number.replace("+82", "0")
@@ -319,16 +316,17 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
         when{
             !isPicture -> {
                 tooltips.add(TooltipObject(binding.imageView, null, "사진 촬영을 안했어요.", TooltipContentPosition.BOTTOM))
-                tooltips.add(TooltipObject(binding.facilityTakePic, null, "사진을 찍으세요.", TooltipContentPosition.TOP))
+                tooltips.add(TooltipObject(binding.fallcarTakePic, null, "사진을 찍으세요.", TooltipContentPosition.TOP))
             }
             param[latitude]!!.length < 5 -> {
-                tooltips.add(TooltipObject(binding.facilityXyLayout, null, "좌표를 모르겠어요.", TooltipContentPosition.BOTTOM))
+                tooltips.add(TooltipObject(binding.fallcarXyLayout, null, "좌표를 모르겠어요.", TooltipContentPosition.BOTTOM))
                 tooltips.add(TooltipObject(binding.editXy, null, "위치를 입력하세요.", TooltipContentPosition.TOP))
             }
-            !isPname -> tooltips.add(TooltipObject(binding.facilityPnameValue, null, "소속을 알맞게 채워주세요.", TooltipContentPosition.TOP))
-            param[fm1_tnsckfwkdth]!!.length < 2 -> tooltips.add(TooltipObject(binding.facilityPlacenameValue, null, "장소에 대한 설명을 적어주세요.", TooltipContentPosition.TOP))
-            binding.facilityPositionValue.selectedItemPosition < 1 -> tooltips.add(TooltipObject(binding.facilityPositionValue, null, "장소분류를 선택하세요.", TooltipContentPosition.TOP))
-            binding.facilityFacilityTypeValue.selectedItemPosition < 1 -> tooltips.add(TooltipObject(binding.facilityFacilityTypeValue, null, "시설분류를 선택하세요.", TooltipContentPosition.TOP))
+            !isPname -> tooltips.add(TooltipObject(binding.fallcarPnameValue, null, "소속을 알맞게 채워주세요.", TooltipContentPosition.TOP))
+            param[fm1_tnsckfwkdth]!!.length < 2 -> tooltips.add(TooltipObject(binding.fallcarPlacenameValue, null, "장소에 대한 설명을 적어주세요.", TooltipContentPosition.TOP))
+            binding.fallcarPositionValue.selectedItemPosition < 1 -> tooltips.add(TooltipObject(binding.fallcarPositionValue, null, "장소분류를 선택하세요.", TooltipContentPosition.TOP))
+            binding.fallcarPointType.selectedItemPosition < 1 -> tooltips.add(TooltipObject(binding.fallcarPointType, null, "차량이 <font color=\"#FFC300\">추락한 위치</font>인가요? 아니면 추락한 곳 근처에 있는 <font color=\"#FFC300\">표지판</font> 인가요?", TooltipContentPosition.TOP))
+
         }
         if(tooltips.size>0){
             tooltipDialog?.show(this,supportFragmentManager,"checkInputValue",tooltips)
@@ -342,10 +340,10 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
     private fun requestEachPermission(name : String, permissionString : String) : Boolean{
         if(ActivityCompat.checkSelfPermission(this, permissionString) != PackageManager.PERMISSION_GRANTED){
             log(TAG,"requestEachPermission - $permissionString -> fail")
-            Snackbar.make(binding.facilityLogView, "$name 권한이 필요합니다.", Snackbar.LENGTH_INDEFINITE)
+            Snackbar.make(binding.fallcarLogView, "$name 권한이 필요합니다.", Snackbar.LENGTH_INDEFINITE)
                 .setAction("권한승인") {
                     if(ActivityCompat.shouldShowRequestPermissionRationale(this,permissionString)){
-                        Snackbar.make(binding.facilityLogView, "권한거부 이력이 있습니다.\n설정을 들어가서 직접 변경해주세요.", Snackbar.LENGTH_INDEFINITE)
+                        Snackbar.make(binding.fallcarLogView, "권한거부 이력이 있습니다.\n설정을 들어가서 직접 변경해주세요.", Snackbar.LENGTH_INDEFINITE)
                             .setAction("설정"){
                                 val intent = Intent()
                                 intent.action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
@@ -378,7 +376,9 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
                 Manifest.permission.READ_PHONE_STATE,
                 Manifest.permission.READ_PHONE_NUMBERS
             ),0)
+
         log(TAG, "requestPermissions end")
+
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray ) {
@@ -391,7 +391,7 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
                 checkPermission = false
         }
         if(!checkPermission) {
-            var sb = Snackbar.make(binding.facilityLogView,"거부된 권한이 있습니다. 사용이 제한됩니다.",Snackbar.LENGTH_SHORT)
+            var sb = Snackbar.make(binding.fallcarLogView,"거부된 권한이 있습니다. 사용이 제한됩니다.",Snackbar.LENGTH_SHORT)
             if(tryCount++ > 1)
                 sb.setAction("설정가기") {
                     val intent = Intent()
@@ -412,7 +412,7 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
     }
     private fun showDialogForLocationServiceSetting(){
         log(TAG,"showDialogForLocationServiceSetting()")
-        val builder = AlertDialog.Builder(this@MainActivity)
+        val builder = AlertDialog.Builder(this@FallCarActivity)
         builder.setTitle("위치 비활성화")
         builder.setMessage("앱을 사용하기 위해서는 위치 서비스가 필요합니다.\n위치 설정을 수정하시겠습니까?")
         builder.setCancelable(true)
@@ -485,7 +485,7 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View) {
         when(v){
-            binding.facilityTakePic -> {
+            binding.fallcarTakePic -> {
                 if(!requestEachPermission("사진 촬영을 위한 [카메라]", Manifest.permission.CAMERA)) return
                 if(!requestEachPermission("촬영한 사진을 불러오기 위한 [저장공간 읽기]", Manifest.permission.READ_EXTERNAL_STORAGE)) return
                 if(!requestEachPermission("촬영한 사진을 저장하기 위한 [저장공간 쓰기]", Manifest.permission.WRITE_EXTERNAL_STORAGE)) return
@@ -493,16 +493,16 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
                 if(!requestEachPermission("사진위치 파악을 위한 [위치정보2]", Manifest.permission.ACCESS_COARSE_LOCATION)) return
                 if(!checkLocationServicesStatus()) showDialogForLocationServiceSetting()
 
-                binding.facilityLatitudeValue.text = ""
-                binding.facilityLongitudeValue.text = ""
-                binding.facilityAddress.text = ""
+                binding.fallcarLatitudeValue.text = ""
+                binding.fallcarLongitudeValue.text = ""
+                binding.fallcarAddress.text = ""
                 sendTakePhotoIntent()
             }
             binding.editXy ->{
                 val i = Intent(this, KakaomapActivity::class.java)
                 startActivity(i)
             }
-            binding.setting-> binding.facilityLogView.visibility = View.INVISIBLE - binding.facilityLogView.visibility
+            binding.setting-> binding.fallcarLogView.visibility = View.INVISIBLE - binding.fallcarLogView.visibility
 
             binding.tltjfanfTransfer ->{
                 if(!requestEachPermission("게시자 식별을 위한 [휴대폰정보]", Manifest.permission.READ_PHONE_STATE)) return
@@ -524,9 +524,9 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
             Thread.sleep(3000)
             isRunningThread = true
             imageResult = HTTP(param,resources.getString(R.string.serverUrl)).
-                DoFileUpload(imageFilepath, resources.getString(R.string.imageUploadUrlJsp))
+            DoFileUpload(imageFilepath, resources.getString(R.string.imageUploadUrlJsp))
             valuesResult = HTTP(param, resources.getString(R.string.serverUrl)).
-                DoValuesUpload("", resources.getString(R.string.saveUrlJsp))
+            DoValuesUpload("", resources.getString(R.string.saveUrlJsp))
             isRunningThread = false
 
             return arrayOf("VALUES/IMAGE RESULT = $valuesResult / $imageResult ", "${imageResult+valuesResult}")
@@ -621,12 +621,12 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
             object : Handler(Looper.getMainLooper()) {
                 override fun handleMessage(msg: Message) {
                     super.handleMessage(msg)
-                    binding.facilityLatitudeValue.text = lati
-                    binding.facilityLongitudeValue.text = longi
-                    binding.facilityAddress.text = addr
-                    binding.facilityDistrictTypeValue.text = type
+                    binding.fallcarLatitudeValue.text = lati
+                    binding.fallcarLongitudeValue.text = longi
+                    binding.fallcarAddress.text = addr
+                    binding.fallcarDistrictTypeValue.text = type
                     if(name!="-")
-                        binding.facilityPlacenameValue.setText(name)
+                        binding.fallcarPlacenameValue.setText(name)
                 }
             }.sendEmptyMessageDelayed(0, 500)
         }
