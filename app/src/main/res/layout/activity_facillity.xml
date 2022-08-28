@@ -28,7 +28,7 @@
                 android:gravity="center"/>
 
             <ImageView
-                android:id="@+id/imageView"
+                android:id="@+id/facility_imageView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="10dp" />
@@ -209,7 +209,7 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="0.3">
+                android:layout_weight="0.28">
 
                 <TextView
                     android:id="@+id/facility_autosize_supprt_textView_small"
@@ -225,6 +225,7 @@
                     android:id="@+id/facility_pname_value"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:dropDownWidth="match_parent"
                     android:layout_margin="5dp"
                     android:layout_weight="0.3"
                     android:background="@drawable/layout_border"
@@ -239,7 +240,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
-                android:layout_weight="0.2"
+                android:layout_weight="0.22"
                 android:autoSizeTextType="uniform"
                 android:background="@drawable/layout_border_gray"
                 android:gravity="center"
@@ -257,7 +258,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/facility_placename_label"
+                android:id="@+id/facility_point_explain_label"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
@@ -266,7 +267,7 @@
                 android:background="@drawable/layout_border_label"
                 android:imeOptions="actionNext"
                 android:lines="1"
-                android:text="장소설명" />
+                android:text="위치설명" />
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -283,7 +284,7 @@
                     android:visibility="invisible" />
 
                 <EditText
-                    android:id="@+id/facility_placename_value"
+                    android:id="@+id/facility_point_explain_value"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
@@ -304,7 +305,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/facility_position_label"
+                android:id="@+id/facility_place_type_label"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
@@ -315,7 +316,7 @@
                 android:text="장소유형" />
 
             <Spinner
-                android:id="@+id/facility_position_value"
+                android:id="@+id/facility_place_type_value"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="5dp"
@@ -330,8 +331,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1.1"
-            android:orientation="horizontal"
-            android:visibility="invisible">
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/facility_facility_type_label"

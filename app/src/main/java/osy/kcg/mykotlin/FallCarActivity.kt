@@ -30,7 +30,6 @@ import io.akndmr.ugly_tooltip.TooltipBuilder
 import io.akndmr.ugly_tooltip.TooltipContentPosition
 import io.akndmr.ugly_tooltip.TooltipDialog
 import io.akndmr.ugly_tooltip.TooltipObject
-import osy.kcg.mykotlin.databinding.ActivityFacillityBinding
 import osy.kcg.mykotlin.databinding.ActivityFallcarBinding
 import osy.kcg.utils.SoundSearcher
 import java.io.File
@@ -48,11 +47,11 @@ open class FallCarActivity : AppCompatActivity(), View.OnClickListener {
         const val address = 2
         const val latitude =3
         const val longitude =4
-        const val fm1_tnsckfwkdth = 5
+        const val pointExplain = 5
         const val fm1_tnsckfwkdth_auto = 6
-        const val fm2_rndur = 7
-        const val fm3_wkdth = 8
-        const val fm4_tltjf = 9
+        const val districtType = 7
+        const val placeType = 8
+        const val pointType = 9
         const val phoneNo = 11
         const val phoneName = 12
         const val imageName = 13
@@ -61,10 +60,9 @@ open class FallCarActivity : AppCompatActivity(), View.OnClickListener {
     var logTextView : EditText? = null
 
     var param : HashMap<Int, String> = hashMapOf(
-        timeStamp to "", address to "", latitude to "", longitude to "", fm1_tnsckfwkdth to "", fm1_tnsckfwkdth_auto to "",
-        fm2_rndur to "", fm3_wkdth to "", fm4_tltjf to "", phoneNo to "", phoneName to "", imageName to ""
+        timeStamp to "", address to "", latitude to "", longitude to "", pointExplain to "", fm1_tnsckfwkdth_auto to "",
+        districtType to "", placeType to "", pointType to "", phoneNo to "", phoneName to "", imageName to ""
     )
-
 
     var isRunningThread = false
     private var imageFilepath : String? = null
@@ -161,12 +159,12 @@ open class FallCarActivity : AppCompatActivity(), View.OnClickListener {
                     "당신이 <font color=\"#FFC300\">어디 소속</font>인지 적어주세요.",
                     TooltipContentPosition.BOTTOM))
                 tooltips.add(TooltipObject(
-                    binding.fallcarPlacenameValue,
+                    binding.fallcarPointExplainValue,
                     "③₂장소설명",
                     "사진의 장소가 주소만으로는 이해하기 어려워요. <font color=\"#FFC300\">주소엔 표시되지 않는 위치</font>를 상세하게 입력해주세요.",
                     TooltipContentPosition.BOTTOM))
                 tooltips.add(TooltipObject(
-                    binding.fallcarPositionValue,
+                    binding.fallcarPlaceTypeValue,
                     "③₃장소분류",
                     "이 장소는 <font color=\"#FFC300\">어떤 장소로 분류</font>되는지 선택해 주세요.",
                     TooltipContentPosition.TOP))
@@ -176,7 +174,7 @@ open class FallCarActivity : AppCompatActivity(), View.OnClickListener {
                     "차량이 <font color=\"#FFC300\">추락한 위치</font>인가요? 아니면 추락한 곳 근처에 있는 <font color=\"#FFC300\">표지판</font> 인가요?",
                     TooltipContentPosition.TOP))
                 tooltips.add(TooltipObject(
-                    binding.tltjfanfTransfer,"마지막!",
+                    binding.fallcarTransfer,"마지막!",
                     "<font color=\"#FFC300\">전송하기</font> 버튼을 눌러서 작성하신 <font color=\"#FFC300\">안전정보</font>를 <font color=\"#FFC300\">국민</font>에게 <font color=\"#FFC300\">제공</font>해주세요.",
                     TooltipContentPosition.TOP
                 )
@@ -195,22 +193,22 @@ open class FallCarActivity : AppCompatActivity(), View.OnClickListener {
         binding.fallcarLongitudeValue.setOnClickListener(this)
         binding.fallcarLatitudeLabel.setOnClickListener(this)
         binding.fallcarLatitudeValue.setOnClickListener(this)
-        binding.fallcarPlacenameLabel.setOnClickListener(this)
+        binding.fallcarPointExplainValue.setOnClickListener(this)
         binding.fallcarDistrictTypeValue.setOnClickListener(this)
-        binding.fallcarPositionLabel.setOnClickListener(this)
-        binding.tltjfanfTransfer.setOnClickListener(this)
+        binding.fallcarPointExplainLabel.setOnClickListener(this)
+        binding.fallcarTransfer.setOnClickListener(this)
         binding.setting.setOnClickListener(this)
         binding.editXy.setOnClickListener(this)
         tooltipDialogContents()
 
         var adapter = ArrayAdapter.createFromResource(this, R.array.wkdth, R.layout.spinner_item)
         adapter.setDropDownViewResource(R.layout.spinner_item_dropdown)
-        binding.fallcarPositionValue.adapter = adapter
+        binding.fallcarPlaceTypeValue.adapter = adapter
         adapter = ArrayAdapter.createFromResource(this, R.array.fallcar, R.layout.spinner_item)
         adapter.setDropDownViewResource(R.layout.spinner_item_dropdown)
         binding.fallcarPointType.adapter = adapter
 
-        binding.fallcarPlacenameValue.setOnKeyListener{ v: View?, code: Int?, _: Any? ->
+        binding.fallcarPointExplainValue.setOnKeyListener{ v: View?, code: Int?, _: Any? ->
             if(code == KeyEvent.KEYCODE_ENTER){
                 val imm : InputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(v?.windowToken,0)
@@ -275,7 +273,11 @@ open class FallCarActivity : AppCompatActivity(), View.OnClickListener {
         if(rstList.size>0){
             val rstItem = arrayOfNulls<String>(rstList.size)
             rstList.toArray(rstItem)
-            binding.fallcarPnameValue.setAdapter(ArrayAdapter<String>(this, R.layout.spinner_item_dropdown, rstItem))
+
+            val adapter = ArrayAdapter<String>(this, R.layout.spinner_item_dropdown, rstItem)
+            binding.fallcarPnameValue.setAdapter(adapter)
+
+
             binding.fallcarPnameValue.showDropDown()
             return
         }
@@ -293,16 +295,16 @@ open class FallCarActivity : AppCompatActivity(), View.OnClickListener {
         param[latitude] = binding.fallcarLatitudeValue.text.toString()
         param[longitude] = binding.fallcarLongitudeValue.text.toString()
 
-        param[fm1_tnsckfwkdth] = binding.fallcarPlacenameValue.text.toString()
-        param[fm1_tnsckfwkdth] = param[fm1_tnsckfwkdth]!!.replace(filter, "?")
-        binding.fallcarPlacenameValue.setText(param[fm1_tnsckfwkdth])
+        param[pointExplain] = binding.fallcarPointExplainValue.text.toString()
+        param[pointExplain] = param[pointExplain]!!.replace(filter, "?")
+        binding.fallcarPointExplainValue.setText(param[pointExplain])
 
 
         param[fm1_tnsckfwkdth_auto] = binding.fallcarPnameValue.text.toString()
 
-        param[fm2_rndur] = binding.fallcarDistrictTypeValue.text.toString()
-        param[fm3_wkdth] = binding.fallcarPositionValue.selectedItem.toString()
-        param[fm4_tltjf] = if(binding.fallcarPointType.selectedItemPosition == 1) "추락지점" else "표지판"
+        param[districtType] = binding.fallcarDistrictTypeValue.text.toString()
+        param[placeType] = binding.fallcarPlaceTypeValue.selectedItem.toString()
+        param[pointType] = if(binding.fallcarPointType.selectedItemPosition == 1) "추락지점" else "표지판"
 
         val telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
         param[phoneNo] = telephonyManager.line1Number.replace("+82", "0")
@@ -323,10 +325,9 @@ open class FallCarActivity : AppCompatActivity(), View.OnClickListener {
                 tooltips.add(TooltipObject(binding.editXy, null, "위치를 입력하세요.", TooltipContentPosition.TOP))
             }
             !isPname -> tooltips.add(TooltipObject(binding.fallcarPnameValue, null, "소속을 알맞게 채워주세요.", TooltipContentPosition.TOP))
-            param[fm1_tnsckfwkdth]!!.length < 2 -> tooltips.add(TooltipObject(binding.fallcarPlacenameValue, null, "장소에 대한 설명을 적어주세요.", TooltipContentPosition.TOP))
-            binding.fallcarPositionValue.selectedItemPosition < 1 -> tooltips.add(TooltipObject(binding.fallcarPositionValue, null, "장소분류를 선택하세요.", TooltipContentPosition.TOP))
+            param[pointExplain]!!.length < 2 -> tooltips.add(TooltipObject(binding.fallcarPointExplainValue, null, "장소에 대한 설명을 적어주세요.", TooltipContentPosition.TOP))
+            binding.fallcarPlaceTypeValue.selectedItemPosition < 1 -> tooltips.add(TooltipObject(binding.fallcarPlaceTypeValue, null, "장소분류를 선택하세요.", TooltipContentPosition.TOP))
             binding.fallcarPointType.selectedItemPosition < 1 -> tooltips.add(TooltipObject(binding.fallcarPointType, null, "차량이 <font color=\"#FFC300\">추락한 위치</font>인가요? 아니면 추락한 곳 근처에 있는 <font color=\"#FFC300\">표지판</font> 인가요?", TooltipContentPosition.TOP))
-
         }
         if(tooltips.size>0){
             tooltipDialog?.show(this,supportFragmentManager,"checkInputValue",tooltips)
@@ -504,7 +505,7 @@ open class FallCarActivity : AppCompatActivity(), View.OnClickListener {
             }
             binding.setting-> binding.fallcarLogView.visibility = View.INVISIBLE - binding.fallcarLogView.visibility
 
-            binding.tltjfanfTransfer ->{
+            binding.fallcarTransfer ->{
                 if(!requestEachPermission("게시자 식별을 위한 [휴대폰정보]", Manifest.permission.READ_PHONE_STATE)) return
                 if(!requestEachPermission("게시자 식별을 위한 [휴대폰번호]", Manifest.permission.READ_PHONE_NUMBERS)) return
                 saveResultValues()
@@ -577,26 +578,26 @@ open class FallCarActivity : AppCompatActivity(), View.OnClickListener {
             val v = msg.what
             if(v==11){
                 s = "성공적으로 전송되었습니다."
-                binding.tltjfanfTransfer.text = "전송완료!"
-                binding.tltjfanfTransfer.setBackgroundResource(R.drawable.layout_border_label)
+                binding.fallcarTransfer.text = "전송완료!"
+                binding.fallcarTransfer.setBackgroundResource(R.drawable.layout_border_label)
 
                 object : Handler(Looper.getMainLooper()){
                     override fun handleMessage(msg: Message) {
                         super.handleMessage(msg)
-                        binding.tltjfanfTransfer.setBackgroundResource(R.drawable.layout_border_yellow)
-                        binding.tltjfanfTransfer.text = "전송하기"
+                        binding.fallcarTransfer.setBackgroundResource(R.drawable.layout_border_yellow)
+                        binding.fallcarTransfer.text = "전송하기"
                     }
                 }.sendEmptyMessageDelayed(0,3000)
             }
             else{
-                binding.tltjfanfTransfer.text = "전송싫패(재시도하기)"
-                binding.tltjfanfTransfer.setBackgroundResource(R.drawable.layout_border_red)
+                binding.fallcarTransfer.text = "전송싫패(재시도하기)"
+                binding.fallcarTransfer.setBackgroundResource(R.drawable.layout_border_red)
 
                 object : Handler(Looper.getMainLooper()){
                     override fun handleMessage(msg: Message) {
                         super.handleMessage(msg)
-                        binding.tltjfanfTransfer.setBackgroundResource(R.drawable.layout_border_yellow)
-                        binding.tltjfanfTransfer.text = "전송하기"
+                        binding.fallcarTransfer.setBackgroundResource(R.drawable.layout_border_yellow)
+                        binding.fallcarTransfer.text = "전송하기"
                     }
                 }.sendEmptyMessageDelayed(0,3000)
             }
@@ -611,11 +612,12 @@ open class FallCarActivity : AppCompatActivity(), View.OnClickListener {
 
     inner class NotificationReceiver : BroadcastReceiver(){
         override fun onReceive(p0: Context?, p1: Intent?) {
+
             val lati = p1?.getStringExtra("latitude")
             val longi = p1?.getStringExtra("longitude")
-            val addr = p1?.getStringExtra("address")
-            val type = p1?.getStringExtra("type")
-            val name = p1?.getStringExtra("name")
+            val address = p1?.getStringExtra("address")
+            val districtPresent = p1?.getStringExtra("districtPresent")
+            val pointExplain = p1?.getStringExtra("pointExplain")
             log("NotificationReceiver", "BroadcastReceiver <- mapActivity")
 
             object : Handler(Looper.getMainLooper()) {
@@ -623,10 +625,10 @@ open class FallCarActivity : AppCompatActivity(), View.OnClickListener {
                     super.handleMessage(msg)
                     binding.fallcarLatitudeValue.text = lati
                     binding.fallcarLongitudeValue.text = longi
-                    binding.fallcarAddress.text = addr
-                    binding.fallcarDistrictTypeValue.text = type
-                    if(name!="-")
-                        binding.fallcarPlacenameValue.setText(name)
+                    binding.fallcarAddress.text = address
+                    binding.fallcarDistrictTypeValue.text = districtPresent
+                    if(pointExplain!="-")
+                        binding.fallcarPointExplainValue.setText(pointExplain)
                 }
             }.sendEmptyMessageDelayed(0, 500)
         }

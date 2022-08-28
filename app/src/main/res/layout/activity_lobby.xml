@@ -185,12 +185,52 @@
             android:layout_height="1dp"
             android:layout_margin="5dp"
             android:background="#ddd"/>
-
-            <Button
-                android:id="@+id/lobby_footer"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:orientation="horizontal">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="3dp"
+                    android:layout_weight="2"
+                    android:layout_marginRight="5dp"
+                    android:src="@drawable/staticon"
+                    android:background="@drawable/layout_border_label"/>
+
+                <Button
+                    android:id="@+id/lobby_four_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="3dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/layout_border_lightblue"
+                    android:autoSizeTextType="uniform"
+                    android:text="등록실적 확인"/>
+            </LinearLayout>
+            <TextView
+                android:id="@+id/lobby_four_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:textSize="25sp"
+                android:autoSizeTextType="uniform"
+                android:text="소속별로 업로드한 내용을 확인할 수 있어요"/>
+
+        </LinearLayout>
+
+
+        <Button
+                android:id="@+id/lobby_footer"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
                 android:background="#00000000"
                 android:layout_margin="5dp"/>
 

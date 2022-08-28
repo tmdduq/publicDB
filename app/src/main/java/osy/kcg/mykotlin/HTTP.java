@@ -117,7 +117,7 @@ public class HTTP {
         if(activityName.contains("point")) {
             dataSet.append("?upTime=").append(URLEncoder.encode(param.get(KakaomapActivity.upTime), StandardCharsets.UTF_8.toString()));
             dataSet.append("&name=").append(URLEncoder.encode(param.get(KakaomapActivity.name), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&pname=").append(URLEncoder.encode(param.get(KakaomapActivity.pname), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&pname=").append(URLEncoder.encode(param.get(KakaomapActivity.pName), StandardCharsets.UTF_8.toString()));
             dataSet.append("&type=").append(URLEncoder.encode(param.get(KakaomapActivity.type), StandardCharsets.UTF_8.toString()));
             dataSet.append("&point=").append(URLEncoder.encode(param.get(KakaomapActivity.point), StandardCharsets.UTF_8.toString()));
         }
@@ -126,12 +126,12 @@ public class HTTP {
             dataSet.append("&add=").append(URLEncoder.encode(param.get(MainActivity.address), StandardCharsets.UTF_8.toString()));
             dataSet.append("&latitude=").append(URLEncoder.encode(param.get(MainActivity.latitude), StandardCharsets.UTF_8.toString()));
             dataSet.append("&longitude=").append(URLEncoder.encode(param.get(MainActivity.longitude), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&form1=").append(URLEncoder.encode(param.get(MainActivity.fm2_rndur), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&form2=").append(URLEncoder.encode(param.get(MainActivity.fm3_wkdth), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&form3=").append(URLEncoder.encode(param.get(MainActivity.fm1_tnsckfwkdth), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&form4=").append(URLEncoder.encode(param.get(MainActivity.fm4_tltjf), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&form1=").append(URLEncoder.encode(param.get(MainActivity.districtType), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&form2=").append(URLEncoder.encode(param.get(MainActivity.placeType), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&form3=").append(URLEncoder.encode(param.get(MainActivity.placeExplain), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&form4=").append(URLEncoder.encode(param.get(MainActivity.facilityType), StandardCharsets.UTF_8.toString()));
             dataSet.append("&phoneNo=").append(URLEncoder.encode(param.get(MainActivity.phoneNo), StandardCharsets.UTF_8.toString()));
-            dataSet.append("&phoneName=").append(URLEncoder.encode(param.get(MainActivity.fm1_tnsckfwkdth_auto), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&phoneName=").append(URLEncoder.encode(param.get(MainActivity.pName), StandardCharsets.UTF_8.toString()));
             dataSet.append("&imageName=").append(URLEncoder.encode(param.get(MainActivity.imageName), StandardCharsets.UTF_8.toString()));
         }
         url = serverUrl + jspUrl + dataSet;

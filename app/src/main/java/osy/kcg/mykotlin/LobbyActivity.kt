@@ -69,6 +69,11 @@ class LobbyActivity : AppCompatActivity(){
             startActivity(Intent(this, FallCarActivity::class.java))
             overridePendingTransition(R.anim.fadein, R.anim.fadeout)
         }
+        binding.lobbyFourButton.setOnClickListener{
+            startActivity(Intent(this, StatisticActivity::class.java))
+            overridePendingTransition(R.anim.fadein, R.anim.fadeout)
+        }
+
     }
 
     private fun initTagView() {

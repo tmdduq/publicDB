@@ -65,6 +65,14 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true">
         </activity>
+
+        <activity
+            android:name="osy.kcg.mykotlin.StatisticActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="true">
+        </activity>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="osy.kcg.mykotlin"

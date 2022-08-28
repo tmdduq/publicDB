@@ -131,6 +131,7 @@
                         android:id="@+id/kakao2_pname_value"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:dropDownWidth="match_parent"
                         android:layout_margin="3dp"
                         android:paddingLeft="10dp"
                         android:gravity="center"

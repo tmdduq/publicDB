@@ -21,6 +21,8 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
@@ -36,7 +38,6 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 open class MainActivity : AppCompatActivity(), View.OnClickListener {
@@ -47,11 +48,11 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
         const val address = 2
         const val latitude =3
         const val longitude =4
-        const val fm1_tnsckfwkdth = 5
-        const val fm1_tnsckfwkdth_auto = 6
-        const val fm2_rndur = 7
-        const val fm3_wkdth = 8
-        const val fm4_tltjf = 9
+        const val placeExplain = 5
+        const val pName = 6
+        const val districtType = 7
+        const val placeType = 8
+        const val facilityType = 9
 //        const val fm4_tltjf_check = 10
         const val phoneNo = 11
         const val phoneName = 12
@@ -61,11 +62,11 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
     var logTextView : EditText? = null
 
     var param : HashMap<Int, String> = hashMapOf(
-            timeStamp to "", address to "", latitude to "", longitude to "", fm1_tnsckfwkdth to "", fm1_tnsckfwkdth_auto to "",
-            fm2_rndur to "", fm3_wkdth to "", fm4_tltjf to "",  phoneNo to "", phoneName to "", imageName to ""
+            timeStamp to "", address to "", latitude to "", longitude to "", placeExplain to "", pName to "",
+            districtType to "", placeType to "", facilityType to "",  phoneNo to "", phoneName to "", imageName to ""
         )
 
-
+    var isPicture = false
     var isRunningThread = false
     private var imageFilepath : String? = null
     var tryCount : Int = 0
@@ -147,7 +148,7 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
                 )
                 tooltips.add(
                     TooltipObject(
-                        binding.imageView,
+                        binding.facilityImageView,
                         "② 사진확인","<font color=\"#FFC300\">촬영한 사진</font>이 잘 나왔는지, 흔들리지는 않았는지 <font color=\"#FFC300\">확인</font>해주세요.",
                         TooltipContentPosition.BOTTOM))
                 tooltips.add(TooltipObject(
@@ -161,12 +162,12 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
                     "당신이 <font color=\"#FFC300\">어디 소속</font>인지 적어주세요.",
                     TooltipContentPosition.BOTTOM))
                 tooltips.add(TooltipObject(
-                    binding.facilityPlacenameValue,
+                    binding.facilityPointExplainValue,
                     "③₂장소설명",
                     "사진의 장소가 주소만으로는 이해하기 어려워요. <font color=\"#FFC300\">주소엔 표시되지 않는 위치</font>를 상세하게 입력해주세요.",
                     TooltipContentPosition.BOTTOM))
                 tooltips.add(TooltipObject(
-                    binding.facilityPositionValue,
+                    binding.facilityPlaceTypeValue,
                     "③₃장소분류",
                     "이 장소는 <font color=\"#FFC300\">어떤 장소로 분류</font>되는지 선택해 주세요.",
                     TooltipContentPosition.TOP))
@@ -195,23 +196,23 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
         binding.facilityLongitudeValue.setOnClickListener(this)
         binding.facilityLatitudeLabel.setOnClickListener(this)
         binding.facilityLatitudeValue.setOnClickListener(this)
-        binding.facilityPlacenameLabel.setOnClickListener(this)
+        binding.facilityPointExplainLabel.setOnClickListener(this)
         binding.facilityDistrictTypeValue.setOnClickListener(this)
-        binding.facilityPositionLabel.setOnClickListener(this)
+        binding.facilityPlaceTypeLabel.setOnClickListener(this)
         binding.tltjfanfTransfer.setOnClickListener(this)
         binding.facilityFacilityTypeLabel.setOnClickListener(this)
         binding.setting.setOnClickListener(this)
         binding.editXy.setOnClickListener(this)
         tooltipDialogContents()
 
-        var adapter = ArrayAdapter.createFromResource(this, R.array.wkdth, R.layout.spinner_item)
+        val adapter = ArrayAdapter.createFromResource(this, R.array.wkdth, R.layout.spinner_item)
         adapter.setDropDownViewResource(R.layout.spinner_item_dropdown)
-        binding.facilityPositionValue.adapter = adapter
+        binding.facilityPlaceTypeValue.adapter = adapter
 //        adapter = ArrayAdapter.createFromResource(this, R.array.tltjf, R.layout.spinner_item)
 //        adapter.setDropDownViewResource(R.layout.spinner_item_dropdown)
 //        binding.facilityFacilityTypeValue.adapter = adapter
 
-        binding.facilityPlacenameValue.setOnKeyListener{ v: View?, code: Int?, _: Any? ->
+        binding.facilityPointExplainValue.setOnKeyListener{ v: View?, code: Int?, _: Any? ->
             if(code == KeyEvent.KEYCODE_ENTER){
                 val imm : InputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.hideSoftInputFromWindow(v?.windowToken,0)
@@ -222,7 +223,7 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
 
         object:Handler(Looper.myLooper()!!){override fun handleMessage(msg: Message) {
             binding.facilityPnameValue.textSize = binding.facilityAutosizeSupprtTextViewSmall.textSize / (resources.displayMetrics.density)
-            binding.facilityPlacenameValue.textSize = binding.facilityPlacenameLabel.textSize / (resources.displayMetrics.density)
+            binding.facilityPointExplainValue.textSize = binding.facilityPointExplainLabel.textSize / (resources.displayMetrics.density)
         }
         }.sendEmptyMessageDelayed(0,500)
 
@@ -239,8 +240,8 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 }.sendEmptyMessageDelayed(0,500)
                 runFirstComplete()
-                val string = binding.facilityPnameValue.text.toString()
 
+                val string = binding.facilityPnameValue.text.toString()
                 resources.getStringArray(R.array.pName).iterator().forEach {
                     if(it==string) {
                         (getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager)
@@ -295,16 +296,16 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
         param[latitude] = binding.facilityLatitudeValue.text.toString()
         param[longitude] = binding.facilityLongitudeValue.text.toString()
 
-        param[fm1_tnsckfwkdth] = binding.facilityPlacenameValue.text.toString()
-        param[fm1_tnsckfwkdth] = param[fm1_tnsckfwkdth]!!.replace(filter, "?")
-        binding.facilityPlacenameValue.setText(param[fm1_tnsckfwkdth])
+        param[placeExplain] = binding.facilityPointExplainValue.text.toString()
+        param[placeExplain] = param[placeExplain]!!.replace(filter, "?")
+        binding.facilityPointExplainValue.setText(param[placeExplain])
 
 
-        param[fm1_tnsckfwkdth_auto] = binding.facilityPnameValue.text.toString()
+        param[pName] = binding.facilityPnameValue.text.toString()
 
-        param[fm2_rndur] = binding.facilityDistrictTypeValue.text.toString()
-        param[fm3_wkdth] = binding.facilityPositionValue.selectedItem.toString()
-        param[fm4_tltjf] = binding.facilityFacilityTypeValue.selectedItem.toString()
+        param[districtType] = binding.facilityDistrictTypeValue.text.toString()
+        param[placeType] = binding.facilityPlaceTypeValue.selectedItem.toString()
+        param[facilityType] = binding.facilityFacilityTypeValue.selectedItem.toString()
 //        param[fm4_tltjf_check] = if(binding.facilityBreakCheckbox.isChecked) "O" else "X"
 
         val telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
@@ -315,10 +316,10 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
     private fun checkResultValues() : Boolean{
         var isPname = false
         val tooltips: ArrayList<TooltipObject> = ArrayList()
-        resources.getStringArray(R.array.pName).forEach { (if(it == param[fm1_tnsckfwkdth_auto]) isPname = true) }
+        resources.getStringArray(R.array.pName).forEach { (if(it == param[pName]) isPname = true) }
         when{
             !isPicture -> {
-                tooltips.add(TooltipObject(binding.imageView, null, "사진 촬영을 안했어요.", TooltipContentPosition.BOTTOM))
+                tooltips.add(TooltipObject(binding.facilityImageView, null, "사진 촬영을 안했어요.", TooltipContentPosition.BOTTOM))
                 tooltips.add(TooltipObject(binding.facilityTakePic, null, "사진을 찍으세요.", TooltipContentPosition.TOP))
             }
             param[latitude]!!.length < 5 -> {
@@ -326,9 +327,9 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
                 tooltips.add(TooltipObject(binding.editXy, null, "위치를 입력하세요.", TooltipContentPosition.TOP))
             }
             !isPname -> tooltips.add(TooltipObject(binding.facilityPnameValue, null, "소속을 알맞게 채워주세요.", TooltipContentPosition.TOP))
-            param[fm1_tnsckfwkdth]!!.length < 2 -> tooltips.add(TooltipObject(binding.facilityPlacenameValue, null, "장소에 대한 설명을 적어주세요.", TooltipContentPosition.TOP))
-            binding.facilityPositionValue.selectedItemPosition < 1 -> tooltips.add(TooltipObject(binding.facilityPositionValue, null, "장소분류를 선택하세요.", TooltipContentPosition.TOP))
-            binding.facilityFacilityTypeValue.selectedItemPosition < 1 -> tooltips.add(TooltipObject(binding.facilityFacilityTypeValue, null, "시설분류를 선택하세요.", TooltipContentPosition.TOP))
+            param[placeExplain]!!.length < 2 -> tooltips.add(TooltipObject(binding.facilityPointExplainValue, null, "장소에 대한 설명을 적어주세요.", TooltipContentPosition.TOP))
+            binding.facilityPlaceTypeValue.selectedItemPosition < 1 -> tooltips.add(TooltipObject(binding.facilityPlaceTypeValue, null, "장소분류를 선택하세요.", TooltipContentPosition.TOP))
+//            binding.facilityFacilityTypeValue.selectedItemPosition < 1 -> tooltips.add(TooltipObject(binding.facilityFacilityTypeValue, null, "시설분류를 선택하세요.", TooltipContentPosition.TOP))
         }
         if(tooltips.size>0){
             tooltipDialog?.show(this,supportFragmentManager,"checkInputValue",tooltips)
@@ -391,7 +392,7 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
                 checkPermission = false
         }
         if(!checkPermission) {
-            var sb = Snackbar.make(binding.facilityLogView,"거부된 권한이 있습니다. 사용이 제한됩니다.",Snackbar.LENGTH_SHORT)
+            val sb = Snackbar.make(binding.facilityLogView,"거부된 권한이 있습니다. 사용이 제한됩니다.",Snackbar.LENGTH_SHORT)
             if(tryCount++ > 1)
                 sb.setAction("설정가기") {
                     val intent = Intent()
@@ -430,57 +431,64 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
         builder.create().show()
     }
 
+    private val takePictureIntentActivityResult = registerForActivityResult(StartActivityForResult(), ActivityResultCallback{ result ->
+        val uriString = photoUri.toString()
+
+        if(result.resultCode != Activity.RESULT_OK) {
+            Toast.makeText(mContext, "촬영실패!! 다시 촬영해주세요.", Toast.LENGTH_SHORT).show()
+            log(TAG, "receive TakePhotoIntent -> fail")
+            isPicture = false
+            return@ActivityResultCallback
+        }
+        else if(uriString.length<10){
+            log(TAG, "onActivityResult -> photoUri : $uriString ")
+            Toast.makeText(mContext, "사진 불러오기 실패!! 다시 촬영해주세요.", Toast.LENGTH_SHORT).show()
+            isPicture = false
+            return@ActivityResultCallback
+        }
+//            val intent: Intent? = result.data
+//            val data = intent!!.data
+//            log(TAG, "intent : $intent / data : $data")
+
+            log(TAG, "onActivityResult - photoUri ${photoUri.toString().substring(0,9)}...${photoUri.toString().substring(uriString.length-7)}  ")
+            binding.editXy.visibility = View.VISIBLE
+            binding.facilityImageView.setImageURI(photoUri)
+            isPicture = true
+            startActivity(Intent(this, KakaomapActivity::class.java))
+
+    })
+
     private var photoUri : Uri? = null
     private fun sendTakePhotoIntent(){
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        if(takePictureIntent.resolveActivity(packageManager) != null ){
-            var photoFile : File? = null
-            try{
-                photoFile = createImageFile()
-            }catch(e: IOException){
-                e.printStackTrace()
-                log(TAG,"sendTakePhotoIntent exp -> $e")
-            }
+        if(takePictureIntent.resolveActivity(packageManager) == null ) return
 
-            if(photoFile != null){
-                photoUri = FileProvider.getUriForFile(this, packageName, photoFile)
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,photoUri)
-                startActivityForResult(takePictureIntent,345)
-            }
+        var photoFile : File? = null
+        try{
+            photoFile = createImageFile()
+        }catch(e: IOException){
+            e.printStackTrace()
+            log(TAG,"sendTakePhotoIntent exp -> $e")
         }
-        log(TAG,"sendTakePhotoIntent -> ok")
+
+        if(photoFile != null){
+            photoUri = FileProvider.getUriForFile(this, packageName, photoFile)
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,photoUri)
+            takePictureIntentActivityResult.launch(takePictureIntent)
+            log(TAG,"sendTakePhotoIntent -> ok")
+        }
+
 
     }
     private fun createImageFile() : File{
         val timeStamp = SimpleDateFormat("yyyy-mm-dd HH-mm", Locale.KOREA).format(System.currentTimeMillis())
         param[imageName] = timeStamp
         val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        val image = File.createTempFile(
-            param[imageName], ".jpg", storageDir
-        )
+        val image = File.createTempFile(param[imageName], ".jpg", storageDir)
         param[imageName] = image.name
         imageFilepath = image.absolutePath
         log(TAG,"createImageFile -> ok")
         return image
-    }
-
-    var isPicture = false
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == 345 && resultCode == RESULT_OK){
-            binding.imageView.setImageURI(photoUri)
-            isPicture = true
-            val i = Intent(this, KakaomapActivity::class.java)
-            startActivity(i)
-            val uriString = photoUri.toString()
-            binding.editXy.visibility = View.VISIBLE
-            if(uriString!=null && uriString.length>9)
-                log(TAG, "onActivityResult - photoUri ${photoUri.toString().substring(0,9)}...${photoUri.toString().substring(uriString.length-7)}  ")
-        }
-        else{
-            Toast.makeText(mContext, "촬영실패!! 재시도해주세요.", Toast.LENGTH_SHORT).show()
-            log(TAG, "receive TakePhotoIntent -> fail")
-        }
     }
 
     override fun onClick(v: View) {
@@ -510,13 +518,13 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
                 saveResultValues()
                 if(!checkResultValues()) return
 
-                TranferData().execute()
+                TransferData().execute()
                 CheckTask(mContext).execute()
             }
         }
     }
 
-    inner class TranferData() : AsyncTask<Unit,Unit,Array<String>>(){
+    inner class TransferData() : AsyncTask<Unit,Unit,Array<String>>(){
         override fun doInBackground(vararg p0: Unit?): Array<String>? {
             var imageResult = 0
             var valuesResult = 10 * 0
@@ -611,22 +619,22 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     inner class NotificationReceiver : BroadcastReceiver(){
         override fun onReceive(p0: Context?, p1: Intent?) {
-            val lati = p1?.getStringExtra("latitude")
-            val longi = p1?.getStringExtra("longitude")
-            val addr = p1?.getStringExtra("address")
-            val type = p1?.getStringExtra("type")
-            val name = p1?.getStringExtra("name")
+            val latitude = p1?.getStringExtra("latitude")
+            val longitude = p1?.getStringExtra("longitude")
+            val address = p1?.getStringExtra("address")
+            val districtPresent = p1?.getStringExtra("districtPresent")
+            val pointExplain = p1?.getStringExtra("pointExplain")
             log("NotificationReceiver", "BroadcastReceiver <- mapActivity")
 
             object : Handler(Looper.getMainLooper()) {
                 override fun handleMessage(msg: Message) {
                     super.handleMessage(msg)
-                    binding.facilityLatitudeValue.text = lati
-                    binding.facilityLongitudeValue.text = longi
-                    binding.facilityAddress.text = addr
-                    binding.facilityDistrictTypeValue.text = type
-                    if(name!="-")
-                        binding.facilityPlacenameValue.setText(name)
+                    binding.facilityLatitudeValue.text = latitude
+                    binding.facilityLongitudeValue.text = longitude
+                    binding.facilityAddress.text = address
+                    binding.facilityDistrictTypeValue.text = districtPresent
+                    if(pointExplain!="-")
+                        binding.facilityPointExplainValue.setText(pointExplain)
                 }
             }.sendEmptyMessageDelayed(0, 500)
         }

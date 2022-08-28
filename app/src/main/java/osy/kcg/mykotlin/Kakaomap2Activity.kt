@@ -26,6 +26,7 @@ import net.daum.mf.map.api.MapPoint
 import net.daum.mf.map.api.MapPolyline
 import net.daum.mf.map.api.MapView
 import osy.kcg.mykotlin.databinding.ActivityKakaomap2Binding
+import osy.kcg.mykotlin.databinding.ActivityKakaomapBinding
 import osy.kcg.utils.SoundSearcher
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -42,9 +43,9 @@ import kotlin.random.Random
 open class Kakaomap2Activity : AppCompatActivity(), MapView.CurrentLocationEventListener, MapView.MapViewEventListener, View.OnClickListener{
 
     companion object{
-        const val TAG ="KakaomapActivity"
+        const val TAG ="Kakaomap2Activity"
         const val name = 16
-        const val pname = 17
+        const val pName = 17
         const val type = 18
         const val upTime = 19
         const val point = 20
@@ -58,9 +59,10 @@ open class Kakaomap2Activity : AppCompatActivity(), MapView.CurrentLocationEvent
     var dialog : Dialog? = null
     var tooltipDialog : TooltipDialog? = null
 
-    private var rndurMap = HashMap<String, ArrayList<XYRndur>>()
+    private var rndurMap = HashMap<ArrayList<String>, ArrayList<XYRndur>>()
+    class XYRndur internal constructor(var x: Double, var y: Double)
     lateinit var binding: ActivityKakaomap2Binding
-    class XYRndur internal constructor(var x: Double, var y: Double, var type: String? = null, var id: String?=null)
+
 
     var drawModePoints = mutableListOf<MapPoint>()
     private fun calculDistance(p1:MapPoint, p2:MapPoint) : Double{
@@ -116,7 +118,7 @@ open class Kakaomap2Activity : AppCompatActivity(), MapView.CurrentLocationEvent
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
         mContext = this
         loadMapView()
-        attachLinstener()
+        attachListener()
         initTooltipDialog()
     }
 
@@ -186,7 +188,7 @@ open class Kakaomap2Activity : AppCompatActivity(), MapView.CurrentLocationEvent
 
 
 
-    private fun attachLinstener() {
+    private fun attachListener() {
         binding.kakao2UndoButton.setOnClickListener(this)
         binding.kakao2Accept2.setOnClickListener(this)
         binding.kakao2LogButton.setOnClickListener(this)
@@ -208,6 +210,7 @@ open class Kakaomap2Activity : AppCompatActivity(), MapView.CurrentLocationEvent
             }
             return@setOnKeyListener false
         }
+        binding.kakao2PnameValue.dropDownVerticalOffset = -500
         binding.kakao2PnameValue.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             }
@@ -229,12 +232,17 @@ open class Kakaomap2Activity : AppCompatActivity(), MapView.CurrentLocationEvent
                     rstList.toArray(rstItem)
                     binding.kakao2PnameValue.setAdapter(ArrayAdapter<String>(this@Kakaomap2Activity, R.layout.spinner_item_dropdown, rstItem))
                     binding.kakao2PnameValue.showDropDown()
-                    if(rstList.size<5) (getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager)
-                        .hideSoftInputFromWindow(binding.kakao2PnameValue.windowToken,0)
-                    return
+                    val string = binding.kakao2PnameValue.text.toString()
+                    resources.getStringArray(R.array.pName).iterator().forEach {
+                        if (it == string) {
+                            (getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager)
+                                .hideSoftInputFromWindow(binding.kakao2PnameValue.windowToken, 0)
+                            return@forEach
+                        }
+                    }
                 }
-                binding.kakao2PnameValue.dismissDropDown()
-                return
+                else
+                    binding.kakao2PnameValue.dismissDropDown()
             }
 
         })
@@ -304,7 +312,7 @@ open class Kakaomap2Activity : AppCompatActivity(), MapView.CurrentLocationEvent
                 }
 
                 val param : HashMap<Int, String> = hashMapOf(
-                    name to nameValue, pname to pnameValue,
+                    name to nameValue, pName to pnameValue,
                     point to pointValues.toString(),
                     type to (binding.kakao2TypeValue.selectedItem.toString()),
                     upTime to SimpleDateFormat("yyyyMMddHHmmss", Locale.KOREA).format(Calendar.getInstance().timeInMillis)
@@ -317,7 +325,7 @@ open class Kakaomap2Activity : AppCompatActivity(), MapView.CurrentLocationEvent
                 dialog!!.show()
 
                 Thread{
-                    var result = HTTP(param, resources.getString(R.string.serverUrl)).DoValuesUpload("point", resources.getString(R.string.savePointUrlJsp))
+                    val result = HTTP(param, resources.getString(R.string.serverUrl)).DoValuesUpload("point", resources.getString(R.string.savePointUrlJsp))
                     dialog!!.dismiss()
                     if(result == 10)
                         Snackbar.make(binding.kakao2mapView, "구역등록 성공", Snackbar.LENGTH_SHORT).show()
@@ -366,7 +374,7 @@ open class Kakaomap2Activity : AppCompatActivity(), MapView.CurrentLocationEvent
             mapView!!.poiItems.forEach { p-> if(p.tag==1000) mapView!!.removePOIItem(p) }
             mapView!!.polylines.forEach { p -> if(p.tag==1500) mapView!!.removePolyline(p) }
             mapView!!.poiItems.forEach { p-> if(p.tag==1501) mapView!!.removePOIItem(p) }
-            Thread{ drawRndur(0,1,2,3, 4, Color.argb(128, 255, 51, 0) ) }.start()
+            Thread{ drawRndur(0,1,2,3, 4 ) }.start()
             drawModePoints = mutableListOf()  // mutableListOf<MapPoint>()
 
         }
@@ -433,7 +441,7 @@ open class Kakaomap2Activity : AppCompatActivity(), MapView.CurrentLocationEvent
             mapView!!.setZoomLevelFloat( -0.168175f, true)
             
             getInitialLocation()
-            Thread{ drawRndur(0,1,2,3, 4, Color.argb(128, 255, 51, 0))   }.start()
+            Thread{ drawRndur(0,1,2,3, 4)   }.start()
 
         }catch(e : Exception){
             e.printStackTrace()
@@ -459,72 +467,58 @@ open class Kakaomap2Activity : AppCompatActivity(), MapView.CurrentLocationEvent
     }
 
 
-    private fun drawRndur(NO_INDEX: Int, NAME_INDEX : Int,TYPE_INDEX : Int, LAT_INDEX : Int, LON_INDEX :Int, color : Int){
+    private fun drawRndur(NO_INDEX: Int, PNAME_INDEX: Int, NAME_INDEX : Int,TYPE_INDEX : Int, POINTS_INDEX : Int){
+        val url = URL(resources.getString(R.string.serverUrl)+ resources.getString(R.string.getPointUrlJsp))
+        var br : BufferedReader
         try{
-            val url = URL(resources.getString(R.string.serverUrl)+ resources.getString(R.string.getPointUrlJsp))
             val urlConnection = url.openConnection()
             urlConnection.connect()
             val inputStream = urlConnection.getInputStream()
-            val br = BufferedReader(InputStreamReader(inputStream, "utf-8"))
-            val dataHeader = br.readLine()
-            log(TAG, "drawRndur -> $dataHeader")
-
-            var polyline = MapPolyline()
-            polyline.tag = 1000
-            polyline.lineColor = color
-
-            var matchRndur = ArrayList<XYRndur>()
-            var prevPName = ""
-            var pName = ""
-            var type = ""
-            var id = ""
-            var lat = 1.0
-            var lon = 2.0
-
-            var v = br.readLine()
-            while(v!=null){
-                try{
-                    val t = v.split(",")
-                    pName = t[NAME_INDEX]
-                    lat = t[LAT_INDEX].toDouble() // parseDouble
-                    lon = t[LON_INDEX].toDouble()
-                    type = t[TYPE_INDEX]
-                    id = t[NO_INDEX]
-                }catch (e : Exception){
-                    log(TAG, "drawRndur1 Exp: $e")
-                    log(TAG, "drawRndur1 : $v")
-                    e.printStackTrace()
-                }
-                when {
-                    prevPName == pName -> {
-                        matchRndur.add(XYRndur(lat,lon))
-                    }
-                    prevPName !="" -> {
-                        polyline = MapPolyline( )
-                        polyline.tag = 1000
-                        polyline.lineColor = Color.argb(128, Random.nextInt(255), Random.nextInt(255), Random.nextInt(255))  //color
-                        for(p : XYRndur in matchRndur)
-                            polyline.addPoint(MapPoint.mapPointWithGeoCoord(p.x,p.y))
-                        polyline.addPoint(MapPoint.mapPointWithGeoCoord(matchRndur[0].x, matchRndur[0].y))
-                        mapView!!.addPolyline(polyline)
-
-                        rndurMap[prevPName] = matchRndur
-                        matchRndur = ArrayList()
-                        matchRndur.add(XYRndur(lat,lon,type,id))
-                    }
-                    else -> {
-                        matchRndur.add(XYRndur(lat,lon,type,id))
-                    }
-                }
-                prevPName = pName
-                v = br.readLine()
-            }
+            br = BufferedReader(InputStreamReader(inputStream, "utf-8"))
         }catch (e : Exception){
-            e.printStackTrace()
-            log(TAG,"drawRndur2 exp: $e")
+            log(TAG, "drawRndur Error -> $e")
+            return
+        }
+
+        val dataHeader = br.readLine()
+        log(TAG, "drawRndur -> $dataHeader")
+
+        var v = br.readLine()
+        while(v != null){
+            try{
+                val matchRndur = ArrayList<XYRndur>()
+                val t = v.split(",",limit=5)
+                val id = t[NO_INDEX]
+                val pName = t[PNAME_INDEX]
+                val name = t[NAME_INDEX]
+                val districtType = t[TYPE_INDEX]
+                val points = t[POINTS_INDEX]
+                val color = when {
+                    districtType.contains("사망사고") -> Color.argb(128, 0xe6, 0x7e, 0x22)
+                    districtType.contains("위험구역") -> Color.argb(128, 0x9b, 0x59, 0xb6)
+                    districtType.contains("다발구역") -> Color.argb(128, 0x29, 0x80, 0xb9)
+                    else -> Color.argb(128, 0x16, 0xa0, 0x85)
+                }
+
+                var p = points.split("/")
+                for(i : Int in p.indices) {
+                    var t = p[i].split(",")
+                    matchRndur.add(XYRndur(t[0].toDouble(), t[1].toDouble()))
+                }
+                var polyline = MapPolyline()
+                polyline.tag = 1000
+                polyline.lineColor = color
+                for(p : XYRndur in matchRndur)
+                    polyline.addPoint(MapPoint.mapPointWithGeoCoord(p.x,p.y))
+                polyline.addPoint(MapPoint.mapPointWithGeoCoord(matchRndur[0].x, matchRndur[0].y))
+                mapView!!.addPolyline(polyline)
+                rndurMap[arrayListOf(id, pName, name, districtType)] = matchRndur
+            }catch (e : Exception){
+                log(TAG, "drawRndur parsing -> text : $v\nerror -> $e")
+            }
+            v = br.readLine()
         }
     }
-    
 
     override fun onCurrentLocationUpdate(p0: MapView?, p1: MapPoint?, p2: Float) {
         val mapPointGeo = p1!!.mapPointGeoCoord

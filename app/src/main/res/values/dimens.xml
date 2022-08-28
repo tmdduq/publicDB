@@ -3,4 +3,5 @@
     <dimen name="line_width">20dp</dimen>
     <dimen name="spacing_normal">25dp</dimen>
     <dimen name="text_normal">20sp</dimen>
+    <dimen name="tooltip_radius">8dp</dimen>
 </resources>
