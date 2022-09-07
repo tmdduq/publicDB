@@ -54,9 +54,8 @@ class LobbyActivity : AppCompatActivity(){
 
     private fun attachClickListener(){
         binding.lobbyFirstButton.setOnClickListener{
-            if(!requestEachPermission("사진 촬영을 위한 [카메라]", Manifest.permission.CAMERA)) return@setOnClickListener
-            if(!requestEachPermission("사진위치 파악을 위한 [위치정보1]", Manifest.permission.ACCESS_FINE_LOCATION)) return@setOnClickListener
-            if(!requestEachPermission("사진위치 파악을 위한 [위치정보2]", Manifest.permission.ACCESS_COARSE_LOCATION)) return@setOnClickListener
+            if(!requestEachPermission("위치 파악을 위한 [위치정보1]", Manifest.permission.ACCESS_FINE_LOCATION)) return@setOnClickListener
+            if(!requestEachPermission("위치 파악을 위한 [위치정보2]", Manifest.permission.ACCESS_COARSE_LOCATION)) return@setOnClickListener
             if(!checkLocationServicesStatus()) showDialogForLocationServiceSetting()
             startActivity(Intent(this, Kakaomap2Activity::class.java))
             overridePendingTransition(R.anim.fadein, R.anim.fadeout)

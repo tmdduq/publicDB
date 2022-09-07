@@ -46,4 +46,13 @@
     <color name="color_concrete">#95a5a6</color>
     <color name="color_asbestos">#7f8c8d</color>
 
+    <color name="colorPrimary">#ffcacf</color>
+    <color name="colorPrimaryDark">#ffafb7</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="list_color_1">#50b3e1ee</color>
+    <color name="list_color_1a">#506ac6dd</color>
+    <color name="list_color_2">#50ffcacf</color>
+    <color name="list_color_2a">#50fea1ac</color>
+    <color name="list_color_3">#50cde431</color>
+    <color name="list_color_3a">#50a8ca02</color>
 </resources>

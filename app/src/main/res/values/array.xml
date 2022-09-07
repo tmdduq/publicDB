@@ -6,6 +6,7 @@
         <item>사망사고 발생구역</item>
         <item>연안사고 다발구역</item>
         <item>연안사고 위험구역</item>
+        <item>출입통제구역</item>
     </string-array>
 
     <string-array name="wkdth">
@@ -28,6 +29,34 @@
         <item>등록하려는 사진과 위치는..</item>
         <item>추락한 [지점]정보입니다.</item>
         <item>추락지 인근 [표지판]입니다.</item>
+    </string-array>
+    <string-array name="sName">
+        <item tag="1">본청</item>
+        <item tag="2">중부지방청</item>
+        <item tag="3">보령서</item>
+        <item tag="4">인천서</item>
+        <item tag="5">태안서</item>
+        <item tag="6">평택서</item>
+        <item tag="7">서해지방청</item>
+        <item tag="8">군산서</item>
+        <item tag="9">목포서</item>
+        <item tag="10">부안서</item>
+        <item tag="11">여수서</item>
+        <item tag="12">완도서</item>
+        <item tag="13">남해지방청</item>
+        <item tag="14">부산서</item>
+        <item tag="15">사천서</item>
+        <item tag="16">울산서</item>
+        <item tag="17">창원서</item>
+        <item tag="18">통영서</item>
+        <item tag="19">동해지방청</item>
+        <item tag="20">동해서</item>
+        <item tag="21">속초서</item>
+        <item tag="22">울진서</item>
+        <item tag="23">포항서</item>
+        <item tag="24">제주지방청</item>
+        <item tag="25">서귀포서</item>
+        <item tag="26">제주서</item>
     </string-array>
 
     <string-array name="pName">
@@ -127,4 +156,5 @@
         <item tag="94">후포</item>
         <item tag="95">흑산</item>
     </string-array>
+
 </resources>

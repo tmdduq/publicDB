@@ -86,6 +86,7 @@
             android:layout_height="30dp"
             android:background="@drawable/layout_xpenfl"
             android:text="일반지도"
+            android:lines="1"
             android:paddingLeft="3dp"
             android:paddingRight="3dp"
             android:autoSizeTextType="uniform"

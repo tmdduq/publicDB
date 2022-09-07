@@ -65,6 +65,7 @@ class LogoActivity : AppCompatActivity() {
                 override fun handleMessage(msg: Message) {
                     super.handleMessage(msg)
                     dialogControl(false)
+                    var thisVersion = BuildConfig.VERSION_CODE
                     if(version == -1){
                         AlertDialog.Builder(mContext).setTitle("서버 접속 실패").setMessage("서버에 접속할 수 없습니다.\n업데이트하시겠습니까?")
                             .setPositiveButton("확인") { _: DialogInterface, _: Int ->
@@ -81,8 +82,8 @@ class LogoActivity : AppCompatActivity() {
                             }.setCancelable(false)
                             .create().show()
                     }
-                    else if((version != BuildConfig.VERSION_CODE) && (version % 10 == 0)){
-                        AlertDialog.Builder(mContext).setTitle("업데이트 필요").setMessage("업데이트를 반드시 해야합니다.\n업데이트하시겠습니까?")
+                    else if((version != BuildConfig.VERSION_CODE) && ( (version/10) - (BuildConfig.VERSION_CODE/10) ) >0){
+                        AlertDialog.Builder(mContext).setTitle("업데이트 필요").setMessage("반드시 업데이트를 해야합니다.\n업데이트를 해주세요.")
                             .setPositiveButton("확인") { _: DialogInterface, _: Int ->
                                 object : Handler(Looper.getMainLooper()){
                                     override fun handleMessage(msg: Message) {

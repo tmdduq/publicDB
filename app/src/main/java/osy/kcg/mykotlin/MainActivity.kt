@@ -27,6 +27,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 import io.akndmr.ugly_tooltip.TooltipBuilder
 import io.akndmr.ugly_tooltip.TooltipContentPosition
@@ -53,7 +54,7 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
         const val districtType = 7
         const val placeType = 8
         const val facilityType = 9
-//        const val fm4_tltjf_check = 10
+        const val mainManager = 10
         const val phoneNo = 11
         const val phoneName = 12
         const val imageName = 13
@@ -63,7 +64,8 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     var param : HashMap<Int, String> = hashMapOf(
             timeStamp to "", address to "", latitude to "", longitude to "", placeExplain to "", pName to "",
-            districtType to "", placeType to "", facilityType to "",  phoneNo to "", phoneName to "", imageName to ""
+            districtType to "", placeType to "", facilityType to "",  phoneNo to "", phoneName to "", imageName to "",
+            mainManager to ""
         )
 
     var isPicture = false
@@ -172,6 +174,11 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
                     "이 장소는 <font color=\"#FFC300\">어떤 장소로 분류</font>되는지 선택해 주세요.",
                     TooltipContentPosition.TOP))
                 tooltips.add(TooltipObject(
+                    binding.facilityMainmanager,
+                    "③₄관리주체",
+                    "이 시설물은 <font color=\"#FFC300\">관리 소관</font>이 어디인가요?",
+                    TooltipContentPosition.TOP))
+                tooltips.add(TooltipObject(
                     binding.facilityFacilityTypeValue,
                     "",//""③₄시설분류",
                     "",//"<font color=\"#FFC300\">어떤 시설물</font>인가요? 목록에서 고르면 돼요.",
@@ -203,6 +210,7 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
         binding.facilityFacilityTypeLabel.setOnClickListener(this)
         binding.setting.setOnClickListener(this)
         binding.editXy.setOnClickListener(this)
+        binding.facilityMainmanager.setOnClickListener(this)
         tooltipDialogContents()
 
         val adapter = ArrayAdapter.createFromResource(this, R.array.wkdth, R.layout.spinner_item)
@@ -306,7 +314,7 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
         param[districtType] = binding.facilityDistrictTypeValue.text.toString()
         param[placeType] = binding.facilityPlaceTypeValue.selectedItem.toString()
         param[facilityType] = binding.facilityFacilityTypeValue.selectedItem.toString()
-//        param[fm4_tltjf_check] = if(binding.facilityBreakCheckbox.isChecked) "O" else "X"
+        param[mainManager] = binding.facilityMainmanager.text.toString()
 
         val telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
         param[phoneNo] = telephonyManager.line1Number.replace("+82", "0")
@@ -330,6 +338,7 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
             param[placeExplain]!!.length < 2 -> tooltips.add(TooltipObject(binding.facilityPointExplainValue, null, "장소에 대한 설명을 적어주세요.", TooltipContentPosition.TOP))
             binding.facilityPlaceTypeValue.selectedItemPosition < 1 -> tooltips.add(TooltipObject(binding.facilityPlaceTypeValue, null, "장소분류를 선택하세요.", TooltipContentPosition.TOP))
 //            binding.facilityFacilityTypeValue.selectedItemPosition < 1 -> tooltips.add(TooltipObject(binding.facilityFacilityTypeValue, null, "시설분류를 선택하세요.", TooltipContentPosition.TOP))
+            param[mainManager]!!.length < 2 || param[mainManager]!!.contains("설치기관") -> tooltips.add(TooltipObject(binding.facilityMainmanager, null, "이 시설물은 <font color=\"#FFC300\">관리 소관</font>이 어디인가요?", TooltipContentPosition.TOP))
         }
         if(tooltips.size>0){
             tooltipDialog?.show(this,supportFragmentManager,"checkInputValue",tooltips)
@@ -521,13 +530,16 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
                 TransferData().execute()
                 CheckTask(mContext).execute()
             }
+            binding.facilityMainmanager ->{
+                customDialogMainManager()
+            }
         }
     }
 
     inner class TransferData() : AsyncTask<Unit,Unit,Array<String>>(){
         override fun doInBackground(vararg p0: Unit?): Array<String>? {
             var imageResult = 0
-            var valuesResult = 10 * 0
+            var valuesResult = 0
             if(isRunningThread) return null
             Thread.sleep(3000)
             isRunningThread = true
@@ -577,6 +589,21 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
 
     }
 
+    private fun customDialogMainManager(){
+        AlertDialog.Builder(this)
+            .setView(R.layout.customdialog_mainmanager)
+            .show()
+            .also { alertDialog ->
+                if(alertDialog == null) return@also
+                val inputValue = alertDialog.findViewById<EditText>(R.id.mainmanager_editText)?.text
+                val confirm = alertDialog.findViewById<Button>(R.id.mainmanager_confirmButton)
+                confirm?.setOnClickListener {
+                    alertDialog.dismiss()
+                    binding.facilityMainmanager.text = inputValue.toString()
+                }
+            }
+    }
+
 
     var handler = object : Handler(Looper.getMainLooper()){
         override fun handleMessage(msg: Message) {
@@ -609,9 +636,9 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
                 }.sendEmptyMessageDelayed(0,3000)
             }
             if(v== 0) s =  "전송실패"
-            if(v==10) s =  "사진전송실패"
-            if(v== 1) s =  "입력실패"
-            if(v==21) s =  "내용전송실패"
+            else if(v== 1) s =  "내용전송실패"
+            else if(v==10) s =  "사진전송실패"
+            else s =  "기타에러"
             Toast.makeText(mContext, s , Toast.LENGTH_SHORT).show()
         }
     }

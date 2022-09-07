@@ -88,27 +88,25 @@ public class HTTP {
                 mFileInputStream.close();
                 dos.flush(); // finish upload...
 
-                if (conn.getResponseCode() == 200) {
-                    InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8);
-                    BufferedReader reader = new BufferedReader(tmp);
-                    StringBuilder stringBuffer = new StringBuilder();
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        stringBuffer.append(line);
-                    }
-                }
-                else return 3;
+
+                if (conn.getResponseCode() != 200) return 3;
+
+                InputStreamReader tmp = new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8);
+                BufferedReader reader = new BufferedReader(tmp);
+                String result = "0";
+                String line;
+                while ((line = reader.readLine()) != null)
+                    result = line;
+
                 mFileInputStream.close();
                 dos.close();
-                TRANSFER_RESULT = 1;
-                return TRANSFER_RESULT;
+                return Integer.parseInt(result);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
-            return TRANSFER_RESULT;
+            return 0;
         }
-        return TRANSFER_RESULT;
+        return 0;
     }
 
     public int DoValuesUpload(String activityName, String jspUrl) throws UnsupportedEncodingException {
@@ -130,6 +128,7 @@ public class HTTP {
             dataSet.append("&form2=").append(URLEncoder.encode(param.get(MainActivity.placeType), StandardCharsets.UTF_8.toString()));
             dataSet.append("&form3=").append(URLEncoder.encode(param.get(MainActivity.placeExplain), StandardCharsets.UTF_8.toString()));
             dataSet.append("&form4=").append(URLEncoder.encode(param.get(MainActivity.facilityType), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&form4_check=").append(URLEncoder.encode(param.get(MainActivity.mainManager), StandardCharsets.UTF_8.toString()));
             dataSet.append("&phoneNo=").append(URLEncoder.encode(param.get(MainActivity.phoneNo), StandardCharsets.UTF_8.toString()));
             dataSet.append("&phoneName=").append(URLEncoder.encode(param.get(MainActivity.pName), StandardCharsets.UTF_8.toString()));
             dataSet.append("&imageName=").append(URLEncoder.encode(param.get(MainActivity.imageName), StandardCharsets.UTF_8.toString()));

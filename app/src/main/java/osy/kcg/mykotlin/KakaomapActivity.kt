@@ -260,6 +260,14 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
             }
             return@setOnKeyListener false
         }
+        binding.kakaoPointExplainValue.setOnKeyListener{ v:View?, code:Int?, _:Any?->
+            if(code == KeyEvent.KEYCODE_ENTER){
+                val imm : InputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.hideSoftInputFromWindow(v?.windowToken,0)
+                return@setOnKeyListener true
+            }
+            return@setOnKeyListener false
+        }
         binding.kakaoPnameValue.dropDownVerticalOffset = -500
         binding.kakaoPnameValue.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -346,7 +354,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
                     drawModePoints = mutableListOf() // mutableListOf<MapPoint>()
                     binding.kakaoTitle.text = "구역정보 생성하기"
                     binding.kakaoAccept2.text = "구역정보 전송하기"
-                    binding.kakaoMakeRndurButton.text = " 그리기 종료"
+                    binding.kakaoMakeRndurButton.text = " 생성종료"
                     binding.kakaoRootLayout.setBackgroundColor(Color.argb(40,255,230,130))
                     binding.xpng.visibility = View.INVISIBLE
                     binding.xpngGuide.text = "터치로 구역을 설정하세요."
@@ -690,6 +698,36 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
         }catch(e:Exception){log(TAG, "makerUpdate Error -> $e")}
     }
 
+    private fun getAddress(lat : Double, lon : Double){
+        Thread{
+            val add = HTTP(null,resources.getString(R.string.serverUrl)).
+            Coord2Address("$lat","$lon",resources.getString(R.string.kakaoMapRESTKey),resources.getString(R.string.coord2address))
+            val bundle = Bundle()
+            val message = Message()
+            message.data = bundle
+            if(!add[0].isNullOrEmpty()) bundle.putString("add", add[0]) // 1순위 도로명
+            else if(!add[1].isNullOrEmpty()) bundle.putString("add", add[1])    // 2순위 지번
+            else{   // 3순위 구글주소
+                try{
+                    val address = Geocoder(mContext).getFromLocation(lat,lon,7)
+                    val add2 = address[0].getAddressLine(0)
+                    bundle.putString("add", "(인근)$add2")
+                    log(TAG, "(Std)reversGeo success")
+                }catch(e: IOException){
+                    e.printStackTrace()
+                    log(TAG, "(Std)reversGeo exp: $e")
+                }catch(e: IndexOutOfBoundsException){
+                    e.printStackTrace()
+                    log(TAG, "(Std)reversGeo notFound")
+                }
+            }
+            object : Handler(Looper.getMainLooper()){
+                override fun handleMessage(msg: Message) {
+                    binding.kakaoAddressValue.text = msg.data.getString("add")
+                }
+            }.sendMessage(message)
+        }.start()
+    }
     override fun onMapViewMoveFinished(mapView: MapView?, mapPoint: MapPoint?) {
         if(drawMode) return
         log(TAG, "->MapView onMapViewMoveFinished")
@@ -716,35 +754,8 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
             log(TAG, "(Kao)reversGeo start")
             reverseGeoCoder.startFindingAddress()}.start()*/
 
+        getAddress(latitude,longitude)
 
-        Thread{
-            val add = HTTP(null,resources.getString(R.string.serverUrl)).
-                Coord2Address("$latitude","$longitude",resources.getString(R.string.kakaoMapRESTKey),resources.getString(R.string.coord2address))
-            val bundle = Bundle()
-            val message = Message()
-            message.data = bundle
-            if(!add[0].isNullOrEmpty()) bundle.putString("add", add[0]) // 1순위 도로명
-            else if(!add[1].isNullOrEmpty()) bundle.putString("add", add[1])    // 2순위 지번
-            else{   // 3순위 구글주소
-                try{
-                    val address = Geocoder(mContext).getFromLocation(latitude,longitude,7)
-                    val add2 = address[0].getAddressLine(0)
-                    bundle.putString("add", "(인근)$add2")
-                    log(TAG, "(Std)reversGeo success")
-                }catch(e: IOException){
-                    e.printStackTrace()
-                    log(TAG, "(Std)reversGeo exp: $e")
-                }catch(e: IndexOutOfBoundsException){
-                    e.printStackTrace()
-                    log(TAG, "(Std)reversGeo notFound")
-                }
-            }
-            object : Handler(Looper.getMainLooper()){
-                override fun handleMessage(msg: Message) {
-                    binding.kakaoAddressValue.text = msg.data.getString("add")
-                }
-            }.sendMessage(message)
-        }.start()
     }
 
     override fun onCurrentLocationUpdate(p0: MapView?, p1: MapPoint?, p2: Float) {
