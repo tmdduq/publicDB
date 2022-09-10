@@ -50,15 +50,15 @@ class LogoActivity : AppCompatActivity() {
 
     private fun checkVersion() {
         Log.i(TAG, "checkVersion -> start")
-        var version = 0
+        var serverVersion = 9999
         dialogControl(true)
         Thread{
             Log.i(TAG, "checkVersion Thread -> start")
             try {
-                version = HTTP(null, resources.getString(R.string.serverUrl))
+                serverVersion = HTTP(null, resources.getString(R.string.serverUrl))
                     .VersionCheck(resources.getString(R.string.versionUrl))
-                Log.i(TAG, "checkVersion : $version")
-            }catch (e:Exception){ }
+                Log.i(TAG, "checkVersion : $serverVersion")
+            }catch (e:Exception){ serverVersion = -1}
 
             val mContext = this
             object : Handler(Looper.getMainLooper()){
@@ -66,8 +66,9 @@ class LogoActivity : AppCompatActivity() {
                     super.handleMessage(msg)
                     dialogControl(false)
                     var thisVersion = BuildConfig.VERSION_CODE
-                    if(version == -1){
-                        AlertDialog.Builder(mContext).setTitle("서버 접속 실패").setMessage("서버에 접속할 수 없습니다.\n업데이트하시겠습니까?")
+                    if(serverVersion == -1){
+                        AlertDialog.Builder(mContext).setTitle("서버 접속 실패").setMessage("서버에 접속할 수 없습니다.\n업데이트를 확인하시겠습니까?")
+                            .setCancelable(false)
                             .setPositiveButton("확인") { _: DialogInterface, _: Int ->
                                 object : Handler(Looper.getMainLooper()){
                                     override fun handleMessage(msg: Message) {
@@ -79,11 +80,13 @@ class LogoActivity : AppCompatActivity() {
                                         finish()
                                     }
                                 }.sendEmptyMessage(1)
-                            }.setCancelable(false)
+                            }
+                            .setNegativeButton("아니오"){ _: DialogInterface, _: Int -> finish()  }
                             .create().show()
                     }
-                    else if((version != BuildConfig.VERSION_CODE) && ( (version/10) - (BuildConfig.VERSION_CODE/10) ) >0){
+                    else if((serverVersion != thisVersion) && ( (serverVersion/10) - (BuildConfig.VERSION_CODE/10) ) >0){
                         AlertDialog.Builder(mContext).setTitle("업데이트 필요").setMessage("반드시 업데이트를 해야합니다.\n업데이트를 해주세요.")
+                            .setCancelable(false)
                             .setPositiveButton("확인") { _: DialogInterface, _: Int ->
                                 object : Handler(Looper.getMainLooper()){
                                     override fun handleMessage(msg: Message) {
@@ -95,10 +98,11 @@ class LogoActivity : AppCompatActivity() {
                                         finish()
                                     }
                                 }.sendEmptyMessage(1)
-                            }.setCancelable(false)
+                            }
+                            .setNegativeButton("아니오"){ _: DialogInterface, _: Int -> finish()  }
                             .create().show()
                     }
-                    else if(version != BuildConfig.VERSION_CODE){
+                    else if(serverVersion > thisVersion){
                         AlertDialog.Builder(mContext).setTitle("업데이트 권고").setMessage("신규 버전이 출시되었습니다.\n업데이트하시겠습니까?")
                             .setPositiveButton("확인") { _: DialogInterface, _: Int ->
                                 object : Handler(Looper.getMainLooper()){

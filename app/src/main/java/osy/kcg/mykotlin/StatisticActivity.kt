@@ -84,6 +84,7 @@ class StatisticActivity : AppCompatActivity() {
                 ary!!.add(s)
                 s = br.readLine()
             }
+
             dialogHandler.post {
                 val alertDialogBuilder = AlertDialog.Builder(this, androidx.appcompat.R.style.AlertDialog_AppCompat_Light)
                 val layout: View = layoutInflater.inflate(R.layout.rank_list_view, null)
@@ -99,10 +100,9 @@ class StatisticActivity : AppCompatActivity() {
                 }
                 val alertDialog = alertDialogBuilder.create()
                 alertDialog.show()
-                val window = alertDialog.window
                 val width = resources.displayMetrics.widthPixels
                 val height = resources.displayMetrics.heightPixels
-                window!!.setLayout(width * 5/5, height * 3/5)
+                alertDialog.window!!.setLayout(width * 4/5, height * 3/5)
             }
         }.start()
 

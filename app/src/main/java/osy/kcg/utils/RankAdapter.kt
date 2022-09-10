@@ -22,7 +22,8 @@ class RankAdapter() : BaseAdapter(){
     constructor(context: Context?, data: ArrayList<String>?) : this() {
         mContext = context
         sample = data
-        mLayoutInflater = LayoutInflater.from(mContext)
+        mLayoutInflater =LayoutInflater.from(mContext)
+
     }
 
     override fun getCount(): Int {

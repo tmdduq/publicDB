@@ -1,0 +1,103 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:gravity="center_vertical|center_horizontal"
+android:orientation="vertical"
+android:descendantFocusability="beforeDescendants"
+android:focusableInTouchMode="true">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:background="#C8A9E8"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:gravity="center_vertical|center_horizontal">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/inputpoint_num"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="10dp"
+                android:lines="1"
+                android:padding="3dp"
+                android:text="input"
+                android:autoSizeTextType="uniform"
+                android:background="@drawable/layoutbackground_black"
+                android:layout_weight="1.5"/>
+
+            <EditText
+                android:id="@+id/inputpoint_lat"
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:hint="위도 (Y좌표, Latitude)"
+                android:enabled="false"
+                android:imeOptions="actionUnspecified"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:layout_marginBottom="10dp"
+                android:textColorHint="#ffffffff"
+                android:textColor="#ffffffff" />
+
+            <EditText
+                android:id="@+id/inputpoint_lon"
+                android:layout_width="match_parent"
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:enabled="false"
+                android:hint="경도 (X좌표, Longitude)"
+                android:imeOptions="actionUnspecified"
+                android:inputType="numberDecimal"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:layout_marginBottom="10dp"
+                android:textColorHint="#ffffffff"
+                android:textColor="#ffffffff" />
+        </LinearLayout>
+        <!--<LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.8" />
+            <Button
+                android:id="@+id/inputpoint_accept"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:text="확인"
+                android:textStyle="bold"
+                android:textColor="#ffffffff"
+                android:background="#966DD5" />
+            <Button
+                android:id="@+id/inputpoint_cancel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_margin="5dp"
+                android:text="취소"
+                android:textStyle="bold"
+                android:textColor="#ffffffff"
+                android:background="#966DD5" />
+        </LinearLayout>-->
+
+    </LinearLayout>
+</LinearLayout>
+
+
+</LinearLayout>

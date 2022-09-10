@@ -52,6 +52,20 @@
             android:layout_height="fill_parent"
             android:background="@drawable/layout_border" />
 
+        <TextView
+            android:id="@+id/kakao2crossView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginVertical="60dp"
+            android:gravity="center"
+            android:textSize="20sp"
+            android:visibility="invisible"
+            android:background="@color/white"
+            android:text="교차된 선이 있습니다!!"
+            android:textStyle="bold"
+            android:textColor="#f00"/>
+
         <Button
             android:id="@+id/kakao2_undo_button"
             android:layout_width="wrap_content"
@@ -61,6 +75,17 @@
             android:layout_margin="5dp"
             android:autoSizeTextType="uniform"
             android:text="되돌리기" />
+
+        <Button
+            android:id="@+id/kakao2_addToTextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginEnd="50dp"
+            android:layout_marginBottom="5dp"
+            android:layout_toStartOf="@+id/kakao2_undo_button"
+            android:autoSizeTextType="uniform"
+            android:text="좌표로입력" />
 
         <Button
             android:id="@+id/kakao2_maptype_swap_button"
@@ -78,10 +103,10 @@
         <EditText
             android:id="@+id/kakao2_log_TextView"
             android:layout_width="match_parent"
-            android:focusable="false"
             android:layout_height="fill_parent"
             android:layout_centerInParent="true"
             android:background="#90f0f0f0"
+            android:focusable="false"
             android:visibility="invisible" />
 
         <Button
@@ -95,7 +120,14 @@
             android:visibility="visible" />
 
     </RelativeLayout>
-
+    <TextView
+        android:id="@+id/kakao2_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="15sp"
+        android:lines="1"
+        android:text=""/>
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -193,13 +225,11 @@
 
             </LinearLayout>
 
-
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
-                android:layout_weight="0.85">
+                android:layout_weight="0.9">
                 <Button
                     android:id="@+id/kakao2_name_label"
                     android:layout_width="match_parent"

@@ -117,6 +117,8 @@ public class HTTP {
             dataSet.append("&name=").append(URLEncoder.encode(param.get(KakaomapActivity.name), StandardCharsets.UTF_8.toString()));
             dataSet.append("&pname=").append(URLEncoder.encode(param.get(KakaomapActivity.pName), StandardCharsets.UTF_8.toString()));
             dataSet.append("&type=").append(URLEncoder.encode(param.get(KakaomapActivity.type), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&placeType=").append(URLEncoder.encode(param.get(KakaomapActivity.type), StandardCharsets.UTF_8.toString()));
+            dataSet.append("&address=").append(URLEncoder.encode(param.get(KakaomapActivity.address), StandardCharsets.UTF_8.toString()));
             dataSet.append("&point=").append(URLEncoder.encode(param.get(KakaomapActivity.point), StandardCharsets.UTF_8.toString()));
         }
         else{

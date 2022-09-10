@@ -38,9 +38,7 @@
         <activity
             android:name="osy.kcg.mykotlin.MainActivity"
             android:windowSoftInputMode="adjustPan"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:exported="true">
-        </activity>
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <activity
             android:name="osy.kcg.mykotlin.KakaomapActivity"
@@ -62,16 +60,13 @@
         <activity
             android:name="osy.kcg.mykotlin.FallCarActivity"
             android:windowSoftInputMode="adjustPan"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:exported="true">
-        </activity>
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
+
 
         <activity
             android:name="osy.kcg.mykotlin.StatisticActivity"
             android:windowSoftInputMode="adjustResize"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:exported="true">
-        </activity>
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"

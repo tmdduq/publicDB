@@ -56,7 +56,10 @@ class LobbyActivity : AppCompatActivity(){
         binding.lobbyFirstButton.setOnClickListener{
             if(!requestEachPermission("위치 파악을 위한 [위치정보1]", Manifest.permission.ACCESS_FINE_LOCATION)) return@setOnClickListener
             if(!requestEachPermission("위치 파악을 위한 [위치정보2]", Manifest.permission.ACCESS_COARSE_LOCATION)) return@setOnClickListener
-            if(!checkLocationServicesStatus()) showDialogForLocationServiceSetting()
+            if(!checkLocationServicesStatus()){
+                showDialogForLocationServiceSetting()
+                return@setOnClickListener
+            }
             startActivity(Intent(this, Kakaomap2Activity::class.java))
             overridePendingTransition(R.anim.fadein, R.anim.fadeout)
         }
@@ -175,14 +178,13 @@ class LobbyActivity : AppCompatActivity(){
         builder.setTitle("위치 비활성화")
         builder.setMessage("앱을 사용하기 위해서는 위치 서비스가 필요합니다.\n위치 설정을 수정하시겠습니까?")
         builder.setCancelable(true)
-        builder.setPositiveButton("설정"){ _: DialogInterface, _:Int->
+        builder.setPositiveButton("설정으로 가기"){_:DialogInterface, _:Int->
             val intent = Intent()
             intent.action = Settings.ACTION_LOCATION_SOURCE_SETTINGS
             startActivity(intent)
         }
-        builder.setNegativeButton("취소(종료"){ dia: DialogInterface, _:Int->
+        builder.setNegativeButton("아니오"){ dia:DialogInterface, _:Int->
             dia.cancel()
-            finish()
             Toast.makeText(this, "위치 서비스를 반드시 활성화하셔야 합니다", Toast.LENGTH_SHORT).show()
         }
         builder.setCancelable(false)

@@ -52,6 +52,7 @@ open class FallCarActivity : AppCompatActivity(), View.OnClickListener {
         const val districtType = 7
         const val placeType = 8
         const val pointType = 9
+        const val mainManager = 10
         const val phoneNo = 11
         const val phoneName = 12
         const val imageName = 13
@@ -61,7 +62,8 @@ open class FallCarActivity : AppCompatActivity(), View.OnClickListener {
 
     var param : HashMap<Int, String> = hashMapOf(
         timeStamp to "", address to "", latitude to "", longitude to "", pointExplain to "", fm1_tnsckfwkdth_auto to "",
-        districtType to "", placeType to "", pointType to "", phoneNo to "", phoneName to "", imageName to ""
+        districtType to "", placeType to "", pointType to "", phoneNo to "", phoneName to "", imageName to "",
+        mainManager to ""
     )
 
     var isRunningThread = false
@@ -305,7 +307,7 @@ open class FallCarActivity : AppCompatActivity(), View.OnClickListener {
         param[districtType] = binding.fallcarDistrictTypeValue.text.toString()
         param[placeType] = binding.fallcarPlaceTypeValue.selectedItem.toString()
         param[pointType] = if(binding.fallcarPointType.selectedItemPosition == 1) "추락지점" else "표지판"
-
+        param[mainManager] = ""
         val telephonyManager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
         param[phoneNo] = telephonyManager.line1Number.replace("+82", "0")
         log(TAG,"saveResultValues -> ok")
@@ -617,7 +619,7 @@ open class FallCarActivity : AppCompatActivity(), View.OnClickListener {
             val longi = p1?.getStringExtra("longitude")
             val address = p1?.getStringExtra("address")
             val districtPresent = p1?.getStringExtra("districtPresent")
-            val pointExplain = p1?.getStringExtra("pointExplain")
+            //val pointExplain = p1?.getStringExtra("pointExplain")
             log("NotificationReceiver", "BroadcastReceiver <- mapActivity")
 
             object : Handler(Looper.getMainLooper()) {
@@ -627,8 +629,7 @@ open class FallCarActivity : AppCompatActivity(), View.OnClickListener {
                     binding.fallcarLongitudeValue.text = longi
                     binding.fallcarAddress.text = address
                     binding.fallcarDistrictTypeValue.text = districtPresent
-                    if(pointExplain!="-")
-                        binding.fallcarPointExplainValue.setText(pointExplain)
+                    //if(pointExplain!="-")  binding.fallcarPointExplainValue.setText(pointExplain)
                 }
             }.sendEmptyMessageDelayed(0, 500)
         }
