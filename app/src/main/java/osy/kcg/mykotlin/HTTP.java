@@ -142,6 +142,19 @@ public class HTTP {
         return HttpValuesUpload(url);
     }
 
+    public String getDownloadFileName(String downloadUrl){
+        try {
+            URL connectUrl = new URL(serverUrl + downloadUrl);
+            URLConnection urlConnection = connectUrl.openConnection();
+            InputStreamReader ir = new InputStreamReader(urlConnection.getInputStream());
+            BufferedReader br = new BufferedReader(ir);
+            return br.readLine();
+        } catch (Exception e) {
+            Log.d(TAG, "VersionCheck - "+e);
+            e.printStackTrace();
+            return null;
+        }
+    }
     public int VersionCheck(String versionUrl){
         try {
             URL connectUrl = new URL(serverUrl + versionUrl);

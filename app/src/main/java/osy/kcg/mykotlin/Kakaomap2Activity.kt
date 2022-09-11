@@ -754,7 +754,6 @@ open class Kakaomap2Activity : AppCompatActivity(), MapView.CurrentLocationEvent
                     Toast.makeText(this,"위도가 잘못되었어요. 확인해주세요.",Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
-
                 val inputLon : Double = try{
                     dialog.findViewById<EditText>(R.id.inputpoint_lon).text.toString().toDouble()
                 }catch(e : Exception){1.0}
@@ -763,9 +762,13 @@ open class Kakaomap2Activity : AppCompatActivity(), MapView.CurrentLocationEvent
                     return@setOnClickListener
                 }
                 else{
-                    ary.add(mutableListOf("$inputLat", "$inputLon"))
-                    adapter.setItem(0, mutableListOf("",""))
-                    listView.adapter = adapter
+                    if(ary.size<8) {
+                        ary.add(mutableListOf("$inputLat", "$inputLon"))
+                        adapter.setItem(0, mutableListOf("", ""))
+                        listView.adapter = adapter
+                    }
+                    else
+                        Toast.makeText(this,"확인(저장) 후 계속 진행해주세요.",Toast.LENGTH_SHORT).show()
                 }
             }
 

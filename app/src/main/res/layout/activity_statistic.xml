@@ -27,12 +27,11 @@
             android:background="@drawable/layout_border_label"
             android:layout_weight="1.5"/>
 
-        <Spinner
+        <osy.kcg.utils.MyAutoCompleteTextView
             android:id="@+id/statistic_pname"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/layout_xpenfl"
-            android:entries="@array/sName"
             android:textAlignment="center"
             android:layout_margin="3dp"
             android:layout_weight="1"/>
@@ -50,6 +49,14 @@
 
 
     </LinearLayout>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_alignEnd="@+id/statistic_webview"
+        android:autoSizeTextType="uniform"
+        android:lines="1"
+        android:layout_marginEnd="5dp"
+        android:text="구역이나 아이콘을 클릭하면 세부내용이 표시돼요." />
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
@@ -62,7 +69,17 @@
             android:layout_height="fill_parent"
             android:background="@drawable/layout_border"/>
 
-
+        <Button
+            android:id="@+id/statistic_download"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/statistic_webview"
+            android:layout_alignParentBottom="true"
+            android:textSize="15sp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:visibility="invisible"
+            android:text="사진 엑셀 다운로드" />
     </RelativeLayout>
 
     <FrameLayout
