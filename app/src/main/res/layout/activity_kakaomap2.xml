@@ -92,7 +92,7 @@
             android:layout_width="wrap_content"
             android:layout_height="30dp"
             android:background="@drawable/layout_xpenfl"
-            android:text="일반지도"
+            android:text="지도변경"
             android:paddingLeft="3dp"
             android:paddingRight="3dp"
             android:autoSizeTextType="uniform"

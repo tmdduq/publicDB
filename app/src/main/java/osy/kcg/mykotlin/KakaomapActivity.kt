@@ -581,6 +581,7 @@ open class KakaomapActivity : AppCompatActivity(), MapView.CurrentLocationEventL
             mapView = MapView(mContext)
             mapViewContainer = binding.kakaomapView
             mapViewContainer!!.addView(mapView)
+            mapView!!.mapType = MapView.MapType.Hybrid
             mapView!!.setCurrentLocationEventListener(this)
             mapView!!.setMapViewEventListener(this)
             mapView!!.currentLocationTrackingMode = MapView.CurrentLocationTrackingMode.TrackingModeOnWithoutHeadingWithoutMapMoving
