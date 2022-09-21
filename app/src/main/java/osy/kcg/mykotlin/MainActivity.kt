@@ -637,10 +637,14 @@ open class MainActivity : AppCompatActivity(), View.OnClickListener {
                     }
                 }.sendEmptyMessageDelayed(0,3000)
             }
-            if(v== 0) s =  "전송실패"
-            else if(v== 1) s =  "내용전송실패"
-            else if(v==10) s =  "사진전송실패"
-            else s =  "기타에러"
+            s = when (v) {
+                11 -> "전송성공"
+                0 -> "전송실패"
+                1 -> "내용전송실패"
+                10 -> "사진전송실패"
+                else -> "기타에러"
+            }
+
             Toast.makeText(mContext, s , Toast.LENGTH_SHORT).show()
         }
     }

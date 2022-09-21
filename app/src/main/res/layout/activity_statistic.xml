@@ -69,23 +69,26 @@
             android:layout_height="fill_parent"
             android:background="@drawable/layout_border"/>
 
-        <Button
+        <TextView
             android:id="@+id/statistic_download"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignEnd="@+id/statistic_webview"
             android:layout_alignParentBottom="true"
-            android:textSize="15sp"
+            android:textSize="20sp"
+            android:background="#8F8F8F"
+            android:textColor="#fff"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
             android:visibility="invisible"
-            android:text="사진 엑셀 다운로드" />
+            android:text="내려받기" />
     </RelativeLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="0.8">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -147,10 +150,15 @@
                     android:text="0건"/>
             </LinearLayout>
         </LinearLayout>
+
     </FrameLayout>
-    <TextView
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="클릭하시면 순위를 확인할 수 있어요."/>
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="클릭하시면 순위를 확인할 수 있어요."/>
+    </FrameLayout>
 </LinearLayout>

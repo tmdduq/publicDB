@@ -22,11 +22,9 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.ArrayAdapter
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.snackbar.Snackbar
 import io.akndmr.ugly_tooltip.TooltipObject
 import osy.kcg.mykotlin.databinding.ActivityStatisticBinding
 import osy.kcg.utils.RankAdapter
@@ -140,20 +138,31 @@ class StatisticActivity : AppCompatActivity() {
                 Toast.makeText(this,"상위부서 다운로드 권한이 없습니다.",Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
-            Thread{
-                try {
-                    dialogHandler.post { dialogControl(true) }
-                    var urlString = resources.getString(R.string.serverUrl) + resources.getString(R.string.downloadUrlJsp)+"?targetName=$pName"
-                    val br = BufferedReader(InputStreamReader(URL(urlString).openStream()))
-                    val s = br.readLine()
-                    fName = s.split("/")[4]
-                    Log.i(TAG, resources.getString(R.string.serverUrl) + s)
-                    downloadManager(Uri.parse(resources.getString(R.string.serverUrl) + s))
-                }catch(e:Exception){
-                    e.printStackTrace()
-                    dialogHandler.post { dialogControl(false) }
+
+            binding.statisticDownload.visibility = View.INVISIBLE
+            AlertDialog.Builder(mContext)
+                .setTitle("엑셀 다운로드")
+                .setMessage("테스트 기능으로 정상동작하지 않을 수 있습니다.\n구역정보 다운로드는 미지원합니다.")
+                .setCancelable(true)
+                .setNegativeButton("취소하기"){ _: DialogInterface, _: Int ->   }
+                .setPositiveButton("확인") { _: DialogInterface, _: Int ->
+                    Thread{
+                        try {
+                            dialogHandler.post { dialogControl(true) }
+                            var urlString = resources.getString(R.string.serverUrl) + resources.getString(R.string.downloadUrlJsp)+"?targetName=$pName"
+                            val br = BufferedReader(InputStreamReader(URL(urlString).openStream()))
+                            val s = br.readLine()
+                            fName = s.split("/")[4]
+                            Log.i(TAG, resources.getString(R.string.serverUrl) + s)
+                            downloadManager(Uri.parse(resources.getString(R.string.serverUrl) + s))
+                        }catch(e:Exception){
+                            e.printStackTrace()
+                            dialogHandler.post { dialogControl(false) }
+                        }
+                    }.start()
                 }
-            }.start()
+                .create().show()
+
         }
     }
 
@@ -321,6 +330,7 @@ class StatisticActivity : AppCompatActivity() {
         when {
             binding.statisticWebview.url.isNullOrEmpty() -> super.onBackPressed()
             binding.statisticWebview.url!!.contains("DATA") -> binding.statisticWebview.goBack()
+            binding.statisticWebview.url!!.contains("List") -> binding.statisticWebview.goBack()
             else -> super.onBackPressed()
         }
     }
@@ -368,7 +378,7 @@ class StatisticActivity : AppCompatActivity() {
                 if (status == DownloadManager.STATUS_SUCCESSFUL) {
                     AlertDialog.Builder(context)
                     .setMessage("다운로드가 완료되었습니다.")
-                        .setPositiveButton("확인"){ dialog, _ ->
+                        .setPositiveButton("열기"){ dialog, _ ->
                             dialog.cancel();
                             var intent = Intent();
                             intent.action = Intent.ACTION_VIEW;
